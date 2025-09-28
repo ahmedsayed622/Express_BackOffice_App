@@ -15,6 +15,9 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Allow example environment file (safe template)
+!.env.example
+
 # Database connection strings and credentials
 *.ora
 tnsnames.ora
