@@ -1,0 +1,358 @@
+openapi: 3.0.3
+info:
+  title: Express BackOffice API - Compliance Module
+  description: |
+    **Compliance API (CmpDorman*) service** for managing dormant client data, orchestrating batch procedures, and providing comprehensive reporting endpoints.
+
+    ## Architecture
+    - **Sequelize ORM**: Standard CRUD operations on tables and views
+    - **node-oracledb**: Dedicated procedure execution with optional `DBMS_LOCK` support
+    - **Unified Error Handling**: `ErrorFactory` pattern with centralized error middleware
+
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: support@company.com
+
+servers:
+  - url: http://{host}:{port}/api/v1
+    description: Configurable server
+    variables:
+      host:
+        default: localhost
+        enum:
+          - localhost
+          - 10.1.118.200
+          - 10.1.118.69
+        description: Server host
+      port:
+        default: "3000"
+        description: Server port
+
+paths:
+  /health/integrations:
+    get:
+      tags: [Health]
+      summary: Check database integrations
+      responses:
+        "200":
+          description: Health status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /client-monthly-data:
+    get:
+      tags: [Client Monthly Data]
+      summary: List all client monthly data
+      responses:
+        "200":
+          description: List of client monthly data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientMonthlyDataListResponse"
+
+  /client-monthly-data/gte-2025:
+    get:
+      tags: [Client Monthly Data]
+      summary: Get data for year >= 2025
+      responses:
+        "200":
+          description: Filtered client monthly data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientMonthlyDataListResponse"
+
+  /client-monthly-data/year/{year}:
+    get:
+      tags: [Client Monthly Data]
+      summary: Get data by year
+      parameters:
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1900
+            maximum: 2100
+      responses:
+        "200":
+          description: Client monthly data for specified year
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientMonthlyDataListResponse"
+
+  /client-monthly-data/year/{year}/month/{month}:
+    get:
+      tags: [Client Monthly Data]
+      summary: Get data by year and month
+      parameters:
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1900
+            maximum: 2100
+        - name: month
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+      responses:
+        "200":
+          description: Client monthly data for specified year and month
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientMonthlyDataListResponse"
+
+  /client-monthly-data/search:
+    get:
+      tags: [Client Monthly Data]
+      summary: Search client monthly data
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 200
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientMonthlyDataListResponse"
+
+  /client-control:
+    get:
+      tags: [Client Control]
+      summary: List client control records
+      responses:
+        "200":
+          description: List of client control records
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /summary:
+    get:
+      tags: [Summary]
+      summary: List summary records
+      responses:
+        "200":
+          description: List of summary records
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /summary/latest/{year}:
+    get:
+      tags: [Summary]
+      summary: Get latest summary for year
+      parameters:
+        - name: year
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1900
+            maximum: 2100
+      responses:
+        "200":
+          description: Latest summary for specified year
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /summary-view:
+    get:
+      tags: [Summary View]
+      summary: List summary view records
+      responses:
+        "200":
+          description: List of summary view records
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /procedures/dormant-orchestrator:
+    post:
+      tags: [Procedures]
+      summary: Execute dormant orchestrator procedure
+      parameters:
+        - name: timeout
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 3600
+            default: 0
+          description: Lock timeout in seconds (0 = no timeout)
+      responses:
+        "200":
+          description: Procedure completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcedureResponse"
+        "409":
+          description: Process already running
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "423":
+          description: Lock timeout
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: object
+
+    HealthResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            sequelize:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: "connected"
+                pool:
+                  type: object
+                  properties:
+                    min:
+                      type: integer
+                    max:
+                      type: integer
+            oracledb:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: "connected"
+                pool:
+                  type: object
+                  properties:
+                    min:
+                      type: integer
+                    max:
+                      type: integer
+
+    ClientMonthlyDataListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ClientMonthlyData"
+
+    ClientMonthlyData:
+      type: object
+      properties:
+        ID:
+          type: integer
+          example: 12345
+        CLIENT_ID:
+          type: string
+          example: "C001"
+        DATA_YEAR:
+          type: integer
+          example: 2025
+        DATA_MONTH:
+          type: integer
+          example: 9
+        INACTIVITY_TO_YEAR:
+          type: integer
+          example: 2024
+        INACTIVITY_TO_MONTH:
+          type: integer
+          example: 12
+
+    ProcedureResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        status:
+          type: string
+          example: "COMPLETED"
+        code:
+          type: string
+          example: "OK"
+        message:
+          type: string
+          example: "Orchestrator completed successfully"
+        driver:
+          type: string
+          example: "node-oracledb"
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        code:
+          type: string
+          enum:
+            [
+              ALREADY_RUNNING,
+              TIMEOUT,
+              VALIDATION_ERROR,
+              NOT_FOUND,
+              INTERNAL_ERROR,
+              PROC_ERROR,
+            ]
+        message:
+          type: string
+
+tags:
+  - name: Health
+    description: System health checks
+  - name: Client Monthly Data
+    description: CMP_DORMAN_TBL_CLIENT_MONTHLY_DATA operations
+  - name: Client Control
+    description: CMP_DORMAN_TBL_CLIENT_CONTROL operations
+  - name: Summary
+    description: CMP_DORMAN_TBL_SUMMARY operations
+  - name: Summary View
+    description: CMP_DORMAN_VIEW_SUMMARY operations
+  - name: Procedures
+    description: Oracle procedure execution via node-oracledb
