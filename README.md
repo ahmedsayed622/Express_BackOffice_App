@@ -41,8 +41,8 @@ Copy-Item .env.example .env.development
 | Environment | NODE_ENV      | Base URL                   | Server            |
 | ----------- | ------------- | -------------------------- | ----------------- |
 | Development | `development` | `http://localhost:3000`    | Local machine     |
-| Test        | `test`        | `http://10.1.118.200:3000` | Test server       |
-| Production  | `production`  | `http://10.1.118.69:3000`  | Production server |
+| Test        | `test`        | `http://YOUR_TEST_SERVER:3000` | Test server       |
+| Production  | `production`  | `http://YOUR_PROD_SERVER:3000`  | Production server |
 
 ### **Run Commands**
 
@@ -64,8 +64,26 @@ npm run start:prod
 1. Import `postman/ComplianceAPI.postman_collection.json`
 2. Set environment variable `baseUrl`:
    - **Development**: `http://localhost:3000`
-   - **Test**: `http://10.1.118.200:3000`
-   - **Production**: `http://10.1.118.69:3000`
+   - **Test**: `http://YOUR_TEST_SERVER:3000`
+   - **Production**: `http://YOUR_PROD_SERVER:3000`
+
+## 🔧 Environment Configuration
+
+For security reasons, the actual server IPs are not exposed in this documentation. To configure your deployment:
+
+1. Create appropriate `.env.{environment}` files (e.g., `.env.test`, `.env.production`)
+2. Replace `YOUR_TEST_SERVER` and `YOUR_PROD_SERVER` with your actual server addresses
+3. Example configuration:
+   ```bash
+   # .env.production
+   NODE_ENV=production
+   PORT=3000
+   DB_HOST=your-db-host
+   DB_PORT=1521
+   DB_SID=your-db-sid
+   DB_USERNAME=your-username
+   DB_PASSWORD=your-password
+   ```
 
 ## 🌐 API Endpoints
 

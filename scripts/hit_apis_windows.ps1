@@ -1,6 +1,6 @@
 # Express BackOffice API - Compliance Module Test Script (Windows PowerShell)
 # Usage: powershell -ExecutionPolicy Bypass -File hit_apis_windows.ps1 [-BaseUrl "http://localhost:3000"]
-# Example: powershell -ExecutionPolicy Bypass -File hit_apis_windows.ps1 -BaseUrl "http://10.1.118.69:3000"
+# Example: powershell -ExecutionPolicy Bypass -File hit_apis_windows.ps1 -BaseUrl "http://YOUR-SERVER:3000"
 
 param(
     [Parameter(Mandatory = $false)]
@@ -107,12 +107,12 @@ Write-Host "  • 500 - Server Error (investigate if occurs)" -ForegroundColor R
 
 Write-Host "`nEnvironment URLs:" -ForegroundColor Blue
 Write-Host "  • Development: http://localhost:3000"
-Write-Host "  • Test: http://10.1.118.200:3000"
-Write-Host "  • Production: http://10.1.118.69:3000"
+Write-Host "  • Test: http://YOUR-TEST-SERVER:3000"
+Write-Host "  • Production: http://YOUR-PROD-SERVER:3000"
 
 Write-Host "`nFor detailed testing, use the Postman collection:" -ForegroundColor Green
 Write-Host "  Import: postman/ComplianceAPI.postman_collection.json"
 
 Write-Host "`nUsage Examples:" -ForegroundColor Blue
 Write-Host '  powershell -ExecutionPolicy Bypass -File scripts\hit_apis_windows.ps1'
-Write-Host '  powershell -ExecutionPolicy Bypass -File scripts\hit_apis_windows.ps1 -BaseUrl "http://10.1.118.69:3000"'
+Write-Host '  powershell -ExecutionPolicy Bypass -File scripts\hit_apis_windows.ps1 -BaseUrl "http://YOUR-SERVER:3000"'

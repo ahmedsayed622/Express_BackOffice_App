@@ -75,3 +75,7 @@ postman/*.postman_globals.json
 # Documentation build artifacts (if any)
 docs/build/
 docs/dist/
+
+# Log files (may contain sensitive information)
+logs/*.log
+!logs/.gitkeep

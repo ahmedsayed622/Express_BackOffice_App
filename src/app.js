@@ -201,10 +201,14 @@ async function startServer() {
         `🔧 API endpoints available at: http://localhost:${PORT}/api`
       );
 
-      // Log all available IP addresses for network access
-      logger.info(`🌐 Company Network Access:`);
-      logger.info(`   - http://10.1.118.200:${PORT}/api`);
-      logger.info(`   - http://10.1.118.200:${PORT}/health`);
+      // Log environment-based network access
+      if (process.env.NODE_ENV === 'development') {
+        logger.info(`🌐 Development Access: http://localhost:${PORT}/api`);
+      } else {
+        logger.info(`🌐 Server Access: Check your environment configuration`);
+        logger.info(`   - API: http://YOUR_SERVER:${PORT}/api`);
+        logger.info(`   - Health: http://YOUR_SERVER:${PORT}/health`);
+      }
       logger.info(`📋 API Documentation: Check API_Documentation.md`);
     });
 

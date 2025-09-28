@@ -2,7 +2,7 @@
 
 # Express BackOffice API - Compliance Module Test Script (Linux)
 # Usage: ./hit_apis_linux.sh [BASE_URL]
-# Example: ./hit_apis_linux.sh http://10.1.118.69:3000
+# Example: ./hit_apis_linux.sh http://YOUR-SERVER:3000
 
 set -euo pipefail
 
@@ -96,8 +96,8 @@ echo -e "  • ${RED}500${NC} - Server Error (investigate if occurs)"
 
 echo -e "\n${BLUE}Environment URLs:${NC}"
 echo -e "  • Development: http://localhost:3000"
-echo -e "  • Test: http://10.1.118.200:3000"
-echo -e "  • Production: http://10.1.118.69:3000"
+echo -e "  • Test: http://YOUR-TEST-SERVER:3000"
+echo -e "  • Production: http://YOUR-PROD-SERVER:3000"
 
 echo -e "\n${GREEN}For detailed testing, use the Postman collection:${NC}"
 echo -e "  Import: postman/ComplianceAPI.postman_collection.json"

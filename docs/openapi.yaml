@@ -22,9 +22,9 @@ servers:
         default: localhost
         enum:
           - localhost
-          - 10.1.118.200
-          - 10.1.118.69
-        description: Server host
+          - your-test-server
+          - your-production-server
+        description: Server host (replace with actual server addresses)
       port:
         default: "3000"
         description: Server port

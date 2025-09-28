@@ -16,11 +16,11 @@ export function getCorsConfiguration() {
       maxAge: 86400, // 24 hours
     },
     test: {
-      origin: [
-        "http://10.1.118.200:3000",
-        "http://10.1.118.200:8080",
-        "http://localhost:3000", // Allow localhost for testing
-      ],
+      origin: process.env.ALLOWED_ORIGINS
+        ? process.env.ALLOWED_ORIGINS.split(",")
+        : [
+            "http://localhost:3000", // Default for testing
+          ],
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
@@ -31,10 +31,8 @@ export function getCorsConfiguration() {
       origin: process.env.ALLOWED_ORIGINS
         ? process.env.ALLOWED_ORIGINS.split(",")
         : [
-            "http://10.1.118.69:3000",
-            "http://10.1.118.69:8080",
-            "https://10.1.118.69:3000",
-            "https://10.1.118.69:8080",
+            "https://your-production-domain.com",
+            "http://your-production-server:3000",
           ],
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
