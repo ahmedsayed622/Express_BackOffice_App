@@ -16,6 +16,31 @@ export default {
     });
   },
 
+  findAndCountAll(
+    where = {},
+    order = [
+      ["analysisPeriodFrom", "DESC"],
+      ["profileId", "ASC"],
+    ],
+    options = {}
+  ) {
+    // Build Sequelize query options with defensive checks
+    const queryOptions = {
+      where,
+      order,
+    };
+
+    // Only add limit/offset if they are valid numbers
+    if (options.limit !== undefined && options.limit !== null) {
+      queryOptions.limit = options.limit;
+    }
+    if (options.offset !== undefined && options.offset !== null) {
+      queryOptions.offset = options.offset;
+    }
+
+    return CmpDormanClientMonthlyDataModel.findAndCountAll(queryOptions);
+  },
+
   findById(profileId) {
     return CmpDormanClientMonthlyDataModel.findByPk(profileId);
   },

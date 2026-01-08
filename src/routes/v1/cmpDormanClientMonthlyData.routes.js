@@ -4,51 +4,47 @@ import { CmpDormanClientMonthlyDataController } from "../../controllers/index.js
 import validateRequest from "../../middlewares/validateRequest.js";
 import {
   yearParam,
-  monthParam,
   profileIdParam,
-  searchQuery,
+  clientMonthlyDataCollectionQuery,
+  clientMonthlyDataYearQuery,
 } from "../../validators/cmpDormanValidators.js";
 
 const router = express.Router();
 
-// Client Monthly Data routes
-router.get("/", CmpDormanClientMonthlyDataController.list);
-router.get("/gte-2025", CmpDormanClientMonthlyDataController.listGte2025);
+/**
+ * Collection endpoint - Always paginated
+ * GET /v1/client-monthly-data
+ * Query params: year, month, q, status, orderBy, limit (default 100), offset (default 0)
+ */
 router.get(
-  "/search",
-  searchQuery,
+  "/",
+  clientMonthlyDataCollectionQuery,
   validateRequest,
-  CmpDormanClientMonthlyDataController.searchAll
-); // ?q=term
+  CmpDormanClientMonthlyDataController.getCollection
+);
+
+/**
+ * Year-specific endpoint - Optional pagination (full year by default)
+ * GET /v1/client-monthly-data/year/:year
+ * Query params: month, q, status, orderBy, limit (optional), offset (optional)
+ */
 router.get(
   "/year/:year",
   yearParam,
+  clientMonthlyDataYearQuery,
   validateRequest,
-  CmpDormanClientMonthlyDataController.byYear
+  CmpDormanClientMonthlyDataController.getByYear
 );
+
+/**
+ * Profile-specific endpoint (single record lookup)
+ * GET /v1/client-monthly-data/profile/:profileId
+ */
 router.get(
-  "/year/:year/month/:month",
-  [...yearParam, ...monthParam],
-  validateRequest,
-  CmpDormanClientMonthlyDataController.byYearMonth
-);
-router.get(
-  "/inact-year/:year",
-  yearParam,
-  validateRequest,
-  CmpDormanClientMonthlyDataController.byInactYear
-);
-router.get(
-  "/inact-year/:year/month/:month",
-  [...yearParam, ...monthParam],
-  validateRequest,
-  CmpDormanClientMonthlyDataController.byInactYearMonth
-);
-router.get(
-  "/:id",
+  "/profile/:profileId",
   profileIdParam,
   validateRequest,
-  CmpDormanClientMonthlyDataController.getById
+  CmpDormanClientMonthlyDataController.getByProfileId
 );
 
 export default router;

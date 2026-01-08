@@ -3,69 +3,153 @@ import { Op } from "sequelize";
 import { CmpDormanClientMonthlyDataRepository } from "../repositories/index.js";
 import { ErrorFactory } from "../utils/index.js";
 
+/**
+ * Build Sequelize where conditions from filters
+ */
+function buildWhereConditions(filters) {
+  const where = {};
+
+  if (filters.year !== undefined && filters.year !== null) {
+  where.inactivityToYear = Number(filters.year);
+}
+
+
+ if (filters.month !== undefined && filters.month !== null) {
+  where.analysisMonth = Number(filters.month);
+}
+
+
+  if (filters.status) {
+    // Map status to appropriate field if needed
+    // This is a placeholder - adjust based on actual status field
+    where.status = filters.status;
+  }
+
+  if (filters.q) {
+    // Search across multiple fields
+    const term = filters.q.trim();
+    const isNumeric = /^\d+$/.test(term);
+    
+    where[Op.or] = [
+      { profileId: { [Op.like]: `%${term}%` } },
+      { clientNameEn: { [Op.like]: `%${term}%` } },
+      { unifiedCode: { [Op.like]: `%${term}%` } },
+    ];
+
+    if (isNumeric) {
+      const numericTerm = parseInt(term, 10);
+      where[Op.or].push(
+        { analysisPeriodFrom: numericTerm },
+        { analysisPeriodTo: numericTerm },
+        { analysisMonth: numericTerm },
+        { inactivityFromYear: numericTerm },
+        { inactivityToYear: numericTerm }
+      );
+    }
+  }
+
+  return where;
+}
+
+/**
+ * Build Sequelize order array from sort options
+ */
+function buildOrderClause(sort) {
+  if (sort.orderBy) {
+    return [[sort.orderBy.field, sort.orderBy.direction]];
+  }
+  // Default ordering
+  return [
+    ["analysisPeriodFrom", "DESC"],
+    ["profileId", "ASC"],
+  ];
+}
+
 export default {
-  list(filters = {}) {
-    return CmpDormanClientMonthlyDataRepository.findAll(filters);
+  /**
+   * Collection endpoint - Always paginated
+   */
+  async getCollection(queryObject) {
+    const { filters, pagination, sort } = queryObject;
+
+    const where = buildWhereConditions(filters);
+    const order = buildOrderClause(sort);
+
+    // Ensure limit and offset are valid numbers
+    const options = {
+      limit: Number(pagination.limit) || 100,
+      offset: Number(pagination.offset) || 0,
+    };
+
+    const result = await CmpDormanClientMonthlyDataRepository.findAndCountAll(
+      where,
+      order,
+      options
+    );
+
+    return {
+      data: result.rows,
+      count: result.rows.length,
+      total: result.count,
+    };
   },
 
-  listGte2025() {
-    return CmpDormanClientMonthlyDataRepository.findGte2025();
+  /**
+   * Year-specific endpoint - Optional pagination
+   */
+  async getByYear(queryObject) {
+    const { filters, pagination, sort } = queryObject;
+
+    const where = buildWhereConditions(filters);
+    const order = buildOrderClause(sort);
+
+    // If pagination provided, use it
+    if (pagination.limit !== undefined) {
+      const options = {
+        limit: Number(pagination.limit) || 100,
+        offset: Number(pagination.offset) || 0,
+      };
+
+      const result = await CmpDormanClientMonthlyDataRepository.findAndCountAll(
+        where,
+        order,
+        options
+      );
+
+      return {
+        data: result.rows,
+        count: result.rows.length,
+        total: result.count,
+      };
+    }
+
+    // No pagination - return all for year
+    const data = await CmpDormanClientMonthlyDataRepository.findAll(
+      where,
+      order
+    );
+
+    return { data };
   },
 
-  async getById(profileId) {
+  /**
+   * Get by profile ID (single record)
+   */
+  async getByProfileId(profileId) {
     if (!profileId) {
       throw ErrorFactory.badRequest("Profile ID is required");
     }
-    const result =
-      await CmpDormanClientMonthlyDataRepository.findById(profileId);
+
+    const result = await CmpDormanClientMonthlyDataRepository.findById(
+      profileId
+    );
+
     if (!result) {
       throw ErrorFactory.notFound(
         `Record with profileId ${profileId} not found`
       );
     }
+
     return result;
-  },
-
-  searchAll(term) {
-    if (!term || term.trim().length === 0) {
-      throw ErrorFactory.badRequest("Search term is required");
-    }
-    return CmpDormanClientMonthlyDataRepository.searchAll(term.trim());
-  },
-
-  listByYear(year) {
-    const yearNum = parseInt(year);
-    if (isNaN(yearNum) || yearNum < 1900 || yearNum > 2100) {
-      throw ErrorFactory.badRequest("Year must be between 1900 and 2100");
-    }
-    return CmpDormanClientMonthlyDataRepository.findAll({
-      analysisPeriodFrom: {
-        [Op.gte]: yearNum * 10000,
-        [Op.lte]: (yearNum + 1) * 10000 - 1,
-      },
-    });
-  },
-
-  listByYearAndMonth(year, month) {
-    return CmpDormanClientMonthlyDataRepository.findAll({
-      analysisMonth: month,
-      analysisPeriodFrom: {
-        [Op.gte]: year * 10000,
-        [Op.lte]: (year + 1) * 10000 - 1,
-      },
-    });
-  },
-
-  listByInactivityYear(year) {
-    return CmpDormanClientMonthlyDataRepository.findAll({
-      inactivityToYear: year,
-    });
-  },
-
-  listByInactivityYearAndMonth(year, month) {
-    return CmpDormanClientMonthlyDataRepository.findAll({
-      inactivityToYear: year,
-      analysisMonth: month,
-    });
   },
 };

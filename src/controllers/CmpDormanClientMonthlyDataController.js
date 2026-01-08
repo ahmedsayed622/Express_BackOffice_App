@@ -2,72 +2,128 @@
 import { CmpDormanClientMonthlyDataService } from "../services/index.js";
 import { asyncWrapper, ErrorFactory } from "../utils/index.js";
 
-const list = asyncWrapper(async (req, res) => {
-  const data = await CmpDormanClientMonthlyDataService.list(req.query);
+/**
+ * Collection endpoint - Always paginated
+ * GET /v1/client-monthly-data
+ */
+const getCollection = asyncWrapper(async (req, res) => {
+  // Build sanitized filters from whitelisted query params
+  const filters = {};
+  if (req.query.year) filters.year = req.query.year;
+  if (req.query.month) filters.month = req.query.month;
+  if (req.query.q) filters.q = req.query.q;
+  if (req.query.status) filters.status = req.query.status;
+
+  // Build pagination (always applied for collection)
+  // Ensure limit and offset are always numbers
+  const limit = req.query.limit !== undefined ? parseInt(req.query.limit, 10) : 100;
+  const offset = req.query.offset !== undefined ? parseInt(req.query.offset, 10) : 0;
   
-  return res.json({ success: true, data });
-});
+  const pagination = {
+    limit,
+    offset,
+    mode: "always",
+  };
 
-const listGte2025 = asyncWrapper(async (req, res) => {
-  //const data = await CmpDormanClientMonthlyDataService.listGte2025();
-  const data = await CmpDormanClientMonthlyDataService.listGte2025();
-console.log("DEBUG rows length:", Array.isArray(data) ? data.length : "not array");
-return res.json({ success: true, data });
-
-  return res.json({ success: true, data });
-});
-
-const getById = asyncWrapper(async (req, res) => {
-  const data = await CmpDormanClientMonthlyDataService.getById(req.params.id);
-  if (!data) {
-    throw ErrorFactory.notFound("Record not found");
+  // Build sort options
+  const sort = {};
+  if (req.query.orderBy) {
+    const [field, direction = "ASC"] = req.query.orderBy.split(":");
+    sort.orderBy = { field, direction: direction.toUpperCase() };
   }
-  return res.json({ success: true, data });
-});
 
-const searchAll = asyncWrapper(async (req, res) => {
-  const data = await CmpDormanClientMonthlyDataService.searchAll(req.query.q);
-  return res.json({ success: true, data });
-});
+  // Build unified query object
+  const queryObject = { filters, pagination, sort };
 
-const byYear = asyncWrapper(async (req, res) => {
-  const data = await CmpDormanClientMonthlyDataService.listByYear(
-    req.params.year
+  // Call service with unified query
+  const result = await CmpDormanClientMonthlyDataService.getCollection(
+    queryObject
   );
-  return res.json({ success: true, data });
+
+  return res.json({
+    success: true,
+    data: result.data,
+    pagination: {
+      limit: pagination.limit,
+      offset: pagination.offset,
+      count: result.count,
+      total: result.total,
+    },
+  });
 });
 
-const byYearMonth = asyncWrapper(async (req, res) => {
-  const data = await CmpDormanClientMonthlyDataService.listByYearAndMonth(
-    req.params.year,
-    req.params.month
+/**
+ * Year-specific endpoint - Optional pagination
+ * GET /v1/client-monthly-data/year/:year
+ */
+const getByYear = asyncWrapper(async (req, res) => {
+  const year = parseInt(req.params.year, 10);
+
+  // Build sanitized filters
+  const filters = { year };
+  if (req.query.month) filters.month = req.query.month;
+  if (req.query.q) filters.q = req.query.q;
+  if (req.query.status) filters.status = req.query.status;
+
+  // Build pagination (optional for year endpoint)
+  const pagination = {
+    mode: "optional",
+  };
+
+  // If limit/offset provided, apply pagination
+  if (req.query.limit !== undefined || req.query.offset !== undefined) {
+    pagination.limit = req.query.limit !== undefined ? parseInt(req.query.limit, 10) : 100;
+    pagination.offset = req.query.offset !== undefined ? parseInt(req.query.offset, 10) : 0;
+  }
+
+  // Build sort options
+  const sort = {};
+  if (req.query.orderBy) {
+    const [field, direction = "ASC"] = req.query.orderBy.split(":");
+    sort.orderBy = { field, direction: direction.toUpperCase() };
+  }
+
+  // Build unified query object
+  const queryObject = { filters, pagination, sort };
+
+  // Call service with unified query
+  const result = await CmpDormanClientMonthlyDataService.getByYear(queryObject);
+
+  // Response format depends on whether pagination was applied
+  const response = {
+    success: true,
+    data: result.data,
+  };
+
+  if (pagination.limit !== undefined) {
+    response.pagination = {
+      limit: pagination.limit,
+      offset: pagination.offset,
+      count: result.count,
+      total: result.total,
+    };
+  }
+
+  return res.json(response);
+});
+
+/**
+ * Profile-specific endpoint (single record)
+ * GET /v1/client-monthly-data/profile/:profileId
+ */
+const getByProfileId = asyncWrapper(async (req, res) => {
+  const profileId = req.params.profileId;
+  const data = await CmpDormanClientMonthlyDataService.getByProfileId(
+    profileId
   );
-  return res.json({ success: true, data });
-});
 
-const byInactYear = asyncWrapper(async (req, res) => {
-  const data = await CmpDormanClientMonthlyDataService.listByInactivityYear(
-    req.params.year
-  );
-  return res.json({ success: true, data });
-});
-
-const byInactYearMonth = asyncWrapper(async (req, res) => {
-  const data =
-    await CmpDormanClientMonthlyDataService.listByInactivityYearAndMonth(
-      req.params.year,
-      req.params.month
+  if (!data) {
+    throw ErrorFactory.notFound(
+      `Record with profileId ${profileId} not found`
     );
+  }
+
   return res.json({ success: true, data });
 });
 
-export {
-  list,
-  listGte2025,
-  getById,
-  searchAll,
-  byYear,
-  byYearMonth,
-  byInactYear,
-  byInactYearMonth,
-};
+export { getCollection, getByYear, getByProfileId };

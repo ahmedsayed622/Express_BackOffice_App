@@ -33,6 +33,109 @@ export const searchQuery = [
     .trim(),
 ];
 
+// Pagination validators
+export const paginationQuery = [
+  query("limit")
+    .optional()
+    .isInt({ min: 1, max: 1000 })
+    .withMessage("limit must be an integer between 1 and 1000")
+    .toInt(),
+  query("offset")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("offset must be a non-negative integer")
+    .toInt(),
+];
+
+// Year query parameter (for filtering in collection endpoint)
+export const yearQuery = [
+  query("year")
+    .optional()
+    .isInt({ min: 1900, max: 2100 })
+    .withMessage("year must be a 4-digit integer within range (1900-2100)")
+    .toInt(),
+];
+
+// Month query parameter (for filtering)
+export const monthQuery = [
+  query("month")
+    .optional()
+    .isInt({ min: 1, max: 12 })
+    .withMessage("month must be between 1 and 12")
+    .toInt(),
+];
+
+// Status query parameter (for filtering)
+export const statusQuery = [
+  query("status")
+    .optional()
+    .isString()
+    .isLength({ min: 1, max: 50 })
+    .withMessage("status must be a string with max 50 characters")
+    .trim(),
+];
+
+// Allowed orderBy fields for client-monthly-data
+const ALLOWED_ORDER_BY_FIELDS = [
+  "profileId",
+  "analysisPeriodFrom",
+  "analysisPeriodTo",
+  "analysisMonth",
+  "inactivityFromYear",
+  "inactivityToYear",
+  "clientNameEn",
+];
+
+// OrderBy validator with whitelist
+export const orderByQuery = [
+  query("orderBy")
+    .optional()
+    .isString()
+    .trim()
+    .custom((value) => {
+      // Format: field:direction (e.g., "analysisPeriodFrom:DESC")
+      const parts = value.split(":");
+      if (parts.length > 2) {
+        throw new Error("orderBy format must be 'field' or 'field:direction'");
+      }
+
+      const field = parts[0];
+      const direction = parts[1] ? parts[1].toUpperCase() : "ASC";
+
+      if (!ALLOWED_ORDER_BY_FIELDS.includes(field)) {
+        throw new Error(
+          `orderBy field must be one of: ${ALLOWED_ORDER_BY_FIELDS.join(", ")}`
+        );
+      }
+
+      if (!["ASC", "DESC"].includes(direction)) {
+        throw new Error("orderBy direction must be ASC or DESC");
+      }
+
+      return true;
+    })
+    .withMessage("orderBy must be a valid field with optional direction"),
+];
+
+// Combined validators for client-monthly-data collection endpoint
+export const clientMonthlyDataCollectionQuery = [
+  ...yearQuery,
+  ...monthQuery,
+  ...searchQuery,
+  ...statusQuery,
+  ...orderByQuery,
+  ...paginationQuery,
+];
+
+// Combined validators for year-specific endpoint
+export const clientMonthlyDataYearQuery = [
+  ...monthQuery,
+  ...searchQuery,
+  ...statusQuery,
+  ...orderByQuery,
+  ...paginationQuery,
+];
+
 export const timeoutQuery = [
   query("timeout")
     .optional()
