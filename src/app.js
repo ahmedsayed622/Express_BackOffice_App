@@ -81,8 +81,42 @@ app.use(
     await testConnection();
     logger.info("Database connection established successfully");
 
-    await syncModels();
-    logger.info("Database tables synchronized successfully");
+    if (process.env.DB_SYNC === "true") {
+      await syncModels();
+      logger.info("Database tables synchronized successfully");
+    } else {
+      logger.info("DB sync is disabled (DB_SYNC!=true) - skipping model.sync()");
+    }
+
+    // Verify table accessibility with a simple count query
+    try {
+      const [countResult] = await sequelize.query(
+        'SELECT COUNT(*) AS CNT FROM BACK_OFFICE.CMP_DORMAN_TBL_MONTHLY_DATA'
+      );
+      const recordCount = countResult[0].CNT;
+      
+      if (recordCount === 0) {
+        logger.warn("⚠️  Table BACK_OFFICE.CMP_DORMAN_TBL_MONTHLY_DATA is empty", {
+          service: "startup-check",
+          hint: "Check if data has been loaded into BACK_OFFICE schema",
+        });
+      } else {
+        logger.info(`✅ Table verification: ${recordCount} records found in BACK_OFFICE schema`, {
+          service: "startup-check",
+        });
+      }
+    } catch (tableCheckError) {
+      logger.error("❌ Unable to query BACK_OFFICE.CMP_DORMAN_TBL_MONTHLY_DATA", {
+        service: "startup-check",
+        error: tableCheckError.message,
+        hint: "Check: 1) Schema access grants, 2) Public synonyms, 3) Duplicate tables in EDATA_PL schema",
+      });
+      
+      if (process.env.NODE_ENV === "production") {
+        throw new Error("Critical: Unable to access data tables");
+      }
+    }
+
   } catch (error) {
     logger.error("Database initialization failed:", error);
     // Don't exit in development for easier debugging

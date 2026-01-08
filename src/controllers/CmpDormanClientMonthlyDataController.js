@@ -4,11 +4,16 @@ import { asyncWrapper, ErrorFactory } from "../utils/index.js";
 
 const list = asyncWrapper(async (req, res) => {
   const data = await CmpDormanClientMonthlyDataService.list(req.query);
+  
   return res.json({ success: true, data });
 });
 
 const listGte2025 = asyncWrapper(async (req, res) => {
+  //const data = await CmpDormanClientMonthlyDataService.listGte2025();
   const data = await CmpDormanClientMonthlyDataService.listGte2025();
+console.log("DEBUG rows length:", Array.isArray(data) ? data.length : "not array");
+return res.json({ success: true, data });
+
   return res.json({ success: true, data });
 });
 

@@ -1,49 +1,58 @@
 // config/db.config.js
 import { Sequelize } from "sequelize";
-import oracledb from "oracledb";
 import { logger } from "../utils/index.js";
+import { initOracleClientOnce, buildConnectString } from "./oracle.client.js";
 
-// Initialize Oracle client with error handling
+// Initialize Oracle Thick mode client once
+initOracleClientOnce();
+
+// Validate required environment variables
+const requiredEnvVars = ['DB_USER', 'DB_PASSWORD', 'DB_HOST', 'DB_PORT'];
+const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+
+if (missingVars.length > 0) {
+  const errorMsg = `Missing required database environment variables: ${missingVars.join(', ')}`;
+  logger.error(errorMsg, { service: "sequelize-oracle" });
+  throw new Error(errorMsg);
+}
+
+// Build connectString using shared function
+let connectString;
+let serviceName;
 try {
-  // Try to initialize Oracle client (path can be set via environment if needed)
-  const clientPath = process.env.ORACLE_CLIENT_PATH;
-  if (clientPath) {
-    oracledb.initOracleClient({ libDir: clientPath });
-    logger.info("Oracle client initialized successfully", {
-      service: "sequelize-oracle",
-      clientPath,
-    });
-  } else {
-    logger.warn(
-      "Oracle client path not provided - trying default initialization",
-      {
-        service: "sequelize-oracle",
-      }
-    );
-    try {
-      oracledb.initOracleClient();
-      logger.info("Oracle client initialized with default settings", {
-        service: "sequelize-oracle",
-      });
-    } catch (defaultError) {
-      logger.warn("Could not initialize Oracle client with default settings", {
-        service: "sequelize-oracle",
-        error: defaultError.message,
-      });
-    }
-  }
+  connectString = buildConnectString();
+  serviceName = process.env.DB_NAME || 
+                process.env.DB_SERVICE_NAME || 
+                process.env.DB_SERVICE;
 } catch (error) {
-  logger.error("Failed to initialize Oracle client:", {
+  logger.error(error.message, { service: "sequelize-oracle" });
+  throw error;
+}
+
+// Log connection info (without password)
+logger.info("Database configuration loaded", {
+  service: "sequelize-oracle",
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  serviceName,
+  connectString,
+});
+
+// Validate DB_SYNC is not enabled inappropriately
+if (process.env.DB_SYNC === "true" && process.env.NODE_ENV === "production") {
+  const errorMsg = "DB_SYNC=true is not allowed in production environment";
+  logger.error(errorMsg, { service: "sequelize-oracle" });
+  throw new Error(errorMsg);
+}
+
+// Warn if DB_SYNC is enabled (potential schema issue with Oracle)
+if (process.env.DB_SYNC === "true") {
+  logger.warn("⚠️  DB_SYNC=true detected - this may create tables in wrong schema with Oracle", {
     service: "sequelize-oracle",
-    error: error.message,
-    stack: error.stack,
+    dbUser: process.env.DB_USER,
+    hint: "Tables should be created manually in BACK_OFFICE schema. Set DB_SYNC=false after initial setup.",
   });
-  logger.warn(
-    "Continuing without Oracle client initialization - connection may fail",
-    {
-      service: "sequelize-oracle",
-    }
-  );
 }
 
 // Enhanced database pool configuration from environment
@@ -54,9 +63,6 @@ const poolConfig = {
   idle: parseInt(process.env.DB_POOL_IDLE) || 10000,
 };
 
-// Build connect string from environment variables
-const connectString = `${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_SERVICE}`;
-
 // Create Sequelize instance with Oracle configuration
 const sequelize = new Sequelize({
   dialect: "oracle",
@@ -64,7 +70,7 @@ const sequelize = new Sequelize({
   password: process.env.DB_PASSWORD,
   host: process.env.DB_HOST,
   port: parseInt(process.env.DB_PORT) || 1521,
-  database: process.env.DB_SERVICE,
+  database: serviceName,
   dialectOptions: {
     connectString,
   },
@@ -75,6 +81,10 @@ const sequelize = new Sequelize({
       : false,
   benchmark: process.env.NODE_ENV === "development",
   logQueryParameters: process.env.NODE_ENV === "development",
+  logging: (sql, timing) => {
+    console.log("SEQUELIZE_SQL:", sql);
+  },
+  benchmark: true,
 });
 
 // Test the connection with enhanced error handling
@@ -94,9 +104,8 @@ const testConnection = async () => {
       message: error.message,
       code: error.code || "UNKNOWN",
       errno: error.errno,
-      sql: error.sql,
       environment: process.env.NODE_ENV,
-      connectString,
+      connectString, // Do not log password
     });
 
     // Provide helpful error messages for common Oracle errors
@@ -111,6 +120,15 @@ const testConnection = async () => {
         service: "sequelize",
         username: process.env.DB_USER,
       });
+    } else if (error.errno === 12514) {
+      logger.error(
+        "🔌 ORA-12514: Service name not registered with listener or wrong service name",
+        {
+          service: "sequelize",
+          connectString,
+          hint: "Check: 1) Service name vs SID, 2) Run 'lsnrctl status' on DB server, 3) Query v$services or show parameter service_names",
+        }
+      );
     } else if (error.errno === 12541) {
       logger.error(
         "🔌 Check if the Oracle listener is running on the specified port",

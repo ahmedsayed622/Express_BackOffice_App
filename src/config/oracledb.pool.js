@@ -1,64 +1,20 @@
 // config/oracledb.pool.js
 import oracledb from "oracledb";
-import fs from "fs";
-import path from "path";
 import { logger } from "../utils/index.js";
+import { initOracleClientOnce, buildConnectString } from "./oracle.client.js";
 
 let pool = null;
-
-/**
- * Initialize Oracle Instant Client if needed (cross-platform)
- */
-function maybeInitOracleClient() {
-  const libDir = process.env.ORACLE_CLIENT_LIB_DIR;
-  if (!libDir) {
-    logger.debug(
-      "ORACLE_CLIENT_LIB_DIR not set - using system Oracle client libraries",
-      {
-        service: "oracle-client",
-      }
-    );
-    return false;
-  }
-
-  if (!fs.existsSync(libDir)) {
-    logger.warn(`ORACLE_CLIENT_LIB_DIR not found: ${libDir} — skipping init`, {
-      service: "oracle-client",
-      libDir,
-    });
-    return false;
-  }
-
-  try {
-    oracledb.initOracleClient({ libDir });
-    logger.info(`Oracle client initialized from: ${libDir}`, {
-      service: "oracle-client",
-      libDir,
-      platform: process.platform,
-    });
-    return true;
-  } catch (e) {
-    logger.warn(
-      `Oracle client init failed: ${e.message} — continuing without explicit init`,
-      {
-        service: "oracle-client",
-        libDir,
-        error: e.message,
-      }
-    );
-    return false;
-  }
-}
 
 /**
  * Initialize Oracle connection pool
  */
 export async function initOraclePool() {
   try {
-    // Try to initialize Oracle client if configured
-    const clientInitialized = maybeInitOracleClient();
+    // Initialize Oracle Thick mode client once
+    initOracleClientOnce();
 
-    const connectString = `${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_SERVICE}`;
+    // Build connectString using shared function (ensures consistency with Sequelize)
+    const connectString = buildConnectString();
 
     const poolConfig = {
       user: process.env.DB_USER,
@@ -82,7 +38,6 @@ export async function initOraclePool() {
       poolMin: poolConfig.poolMin,
       poolMax: poolConfig.poolMax,
       environment: process.env.NODE_ENV,
-      clientInitialized,
     });
 
     return pool;
