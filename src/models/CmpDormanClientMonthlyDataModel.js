@@ -1,6 +1,8 @@
 // models/CmpDormanClientMonthlyDataModel.js
 import { DataTypes } from "sequelize";
-import { sequelize } from "../config/db.config.js";
+import { getSequelize } from "../config/index.js";
+
+const sequelize = getSequelize();
 const CmpDormanClientMonthlyDataModel = sequelize.define(
 "CmpDormanClientMonthlyDataModel",
 {

@@ -1,12 +1,12 @@
-// utils/paths.js - Portable path resolution for ESM
+// utils/paths/paths.js - Portable path resolution for ESM
 import { fileURLToPath } from "url";
 import path from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Calculate project root from src/utils/paths.js
-export const projectRoot = path.resolve(__dirname, "../../");
+// Calculate project root from src/utils/paths/paths.js
+export const projectRoot = path.resolve(__dirname, "../../../");
 
 /**
  * Resolve path segments relative to project root

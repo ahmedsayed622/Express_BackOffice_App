@@ -1,7 +1,7 @@
 // validators/cmpEmpDailyOrdersValidators.js
 import { param, query } from "express-validator";
+import { buildYyyymmddParam, buildYyyymmddQuery } from "./common.js";
 
-// Validate invoice number parameter
 export const invoiceNoParam = [
   param("invoiceNo")
     .isInt({ min: 1 })
@@ -9,7 +9,6 @@ export const invoiceNoParam = [
     .toInt(),
 ];
 
-// Validate execution ID parameter
 export const execIdParam = [
   param("execId")
     .isString()
@@ -18,134 +17,42 @@ export const execIdParam = [
     .trim(),
 ];
 
-// Validate YYYYMMDD date parameter
-export const yyyymmddParam = [
-  param("date")
-    .matches(/^\d{8}$/)
-    .withMessage("Date must be in YYYYMMDD format (8 digits)")
-    .custom((value) => {
-      const year = parseInt(value.substr(0, 4));
-      const month = parseInt(value.substr(4, 2));
-      const day = parseInt(value.substr(6, 2));
+export const yyyymmddParam = buildYyyymmddParam("date", {
+  format: "Date must be in YYYYMMDD format (8 digits)",
+  year: "Year must be between 1900 and 2100",
+  month: "Month must be between 01 and 12",
+  day: "Day must be between 01 and 31",
+});
 
-      if (year < 1900 || year > 2100) {
-        throw new Error("Year must be between 1900 and 2100");
-      }
-      if (month < 1 || month > 12) {
-        throw new Error("Month must be between 01 and 12");
-      }
-      if (day < 1 || day > 31) {
-        throw new Error("Day must be between 01 and 31");
-      }
+export const fromDateParam = buildYyyymmddParam("from", {
+  format: "From date must be in YYYYMMDD format (8 digits)",
+  year: "From year must be between 1900 and 2100",
+  month: "From month must be between 01 and 12",
+  day: "From day must be between 01 and 31",
+});
 
-      return true;
-    })
-    .toInt(),
-];
-
-// Validate from date parameter (for route /from/:from)
-export const fromDateParam = [
-  param("from")
-    .matches(/^\d{8}$/)
-    .withMessage("From date must be in YYYYMMDD format (8 digits)")
-    .custom((value) => {
-      const year = parseInt(value.substr(0, 4));
-      const month = parseInt(value.substr(4, 2));
-      const day = parseInt(value.substr(6, 2));
-
-      if (year < 1900 || year > 2100) {
-        throw new Error("Year must be between 1900 and 2100");
-      }
-      if (month < 1 || month > 12) {
-        throw new Error("Month must be between 01 and 12");
-      }
-      if (day < 1 || day > 31) {
-        throw new Error("Day must be between 01 and 31");
-      }
-
-      return true;
-    })
-    .toInt(),
-];
-
-// Validate date range query parameters
 export const rangeQuery = [
-  query("from")
-    .optional()
-    .matches(/^\d{8}$/)
-    .withMessage("From date must be in YYYYMMDD format (8 digits)")
-    .custom((value) => {
-      if (value) {
-        const year = parseInt(value.substr(0, 4));
-        const month = parseInt(value.substr(4, 2));
-        const day = parseInt(value.substr(6, 2));
-
-        if (year < 1900 || year > 2100) {
-          throw new Error("From year must be between 1900 and 2100");
-        }
-        if (month < 1 || month > 12) {
-          throw new Error("From month must be between 01 and 12");
-        }
-        if (day < 1 || day > 31) {
-          throw new Error("From day must be between 01 and 31");
-        }
-      }
-      return true;
-    })
-    .toInt(),
-  query("to")
-    .optional()
-    .matches(/^\d{8}$/)
-    .withMessage("To date must be in YYYYMMDD format (8 digits)")
-    .custom((value) => {
-      if (value) {
-        const year = parseInt(value.substr(0, 4));
-        const month = parseInt(value.substr(4, 2));
-        const day = parseInt(value.substr(6, 2));
-
-        if (year < 1900 || year > 2100) {
-          throw new Error("To year must be between 1900 and 2100");
-        }
-        if (month < 1 || month > 12) {
-          throw new Error("To month must be between 01 and 12");
-        }
-        if (day < 1 || day > 31) {
-          throw new Error("To day must be between 01 and 31");
-        }
-      }
-      return true;
-    })
-    .toInt(),
+  ...buildYyyymmddQuery("from", {
+    format: "From date must be in YYYYMMDD format (8 digits)",
+    year: "From year must be between 1900 and 2100",
+    month: "From month must be between 01 and 12",
+    day: "From day must be between 01 and 31",
+  }),
+  ...buildYyyymmddQuery("to", {
+    format: "To date must be in YYYYMMDD format (8 digits)",
+    year: "To year must be between 1900 and 2100",
+    month: "To month must be between 01 and 12",
+    day: "To day must be between 01 and 31",
+  }),
 ];
 
-// Validate from query parameter
-export const fromQuery = [
-  query("from")
-    .optional()
-    .matches(/^\d{8}$/)
-    .withMessage("From date must be in YYYYMMDD format (8 digits)")
-    .custom((value) => {
-      if (value) {
-        const year = parseInt(value.substr(0, 4));
-        const month = parseInt(value.substr(4, 2));
-        const day = parseInt(value.substr(6, 2));
+export const fromQuery = buildYyyymmddQuery("from", {
+  format: "From date must be in YYYYMMDD format (8 digits)",
+  year: "From year must be between 1900 and 2100",
+  month: "From month must be between 01 and 12",
+  day: "From day must be between 01 and 31",
+});
 
-        if (year < 1900 || year > 2100) {
-          throw new Error("From year must be between 1900 and 2100");
-        }
-        if (month < 1 || month > 12) {
-          throw new Error("From month must be between 01 and 12");
-        }
-        if (day < 1 || day > 31) {
-          throw new Error("From day must be between 01 and 31");
-        }
-      }
-      return true;
-    })
-    .toInt(),
-];
-
-// Validate search query parameter
 export const searchQuery = [
   query("q")
     .optional()
@@ -155,7 +62,6 @@ export const searchQuery = [
     .trim(),
 ];
 
-// Validate optional filters for list endpoint
 export const listFilters = [
   query("execId")
     .optional()

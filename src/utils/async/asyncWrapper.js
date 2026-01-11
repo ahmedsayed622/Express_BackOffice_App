@@ -1,4 +1,4 @@
-// utils/asyncWrapper.js
+// utils/async/asyncWrapper.js
 /**
  * Wraps an async Express route handler to automatically catch errors
  * and pass them to the Express error handling middleware
@@ -12,5 +12,5 @@ export const asyncWrapper = (fn) => {
   };
 };
 
-// للتوافق مع الكود القديم
+// ā?ā?į?ā?į?ā?ā? ā?į? į?ā?ā?ā?į? į?ā?ā?į?ā?ā?
 export default asyncWrapper;

@@ -1,7 +1,15 @@
 // repositories/procedures/runner/oracleProcedureRunner.js
 import oracledb from "oracledb";
-import { getConnection } from "../../../config/oracledb.pool.js";
+import { getOraclePool, initOraclePool } from "../../../config/index.js";
 import { ErrorFactory } from "../../../utils/index.js";
+
+async function getPoolConnection() {
+  let pool = getOraclePool();
+  if (!pool) {
+    pool = await initOraclePool();
+  }
+  return pool.getConnection();
+}
 
 export async function runWithOptionalLock({
   sqlBlock,
@@ -31,7 +39,7 @@ export async function runWithOptionalLock({
 
     let conn;
     try {
-      conn = await getConnection();
+      conn = await getPoolConnection();
       await conn.execute(
         lockSql,
         {
@@ -71,7 +79,7 @@ export async function runWithOptionalLock({
   } else {
     let conn;
     try {
-      conn = await getConnection();
+      conn = await getPoolConnection();
       await conn.execute(wrapped, bindings, { autoCommit: true });
 
       return {
@@ -108,7 +116,7 @@ export async function runPlainProc({
 
   let conn;
   try {
-    conn = await getConnection();
+    conn = await getPoolConnection();
     await conn.execute(call, params, { autoCommit: true });
 
     return {

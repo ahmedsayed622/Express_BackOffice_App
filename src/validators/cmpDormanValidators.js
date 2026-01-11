@@ -1,17 +1,15 @@
 // validators/cmpDormanValidators.js
 import { param, query, body } from "express-validator";
+import {
+  yearParam,
+  monthParam,
+  paginationQuery,
+  yearQuery,
+  monthQuery,
+  searchQuery,
+} from "./common.js";
 
-export const yearParam = [
-  param("year")
-    .isInt({ min: 1900, max: 2100 })
-    .withMessage("year must be a 4-digit integer within range (1900-2100)"),
-];
-
-export const monthParam = [
-  param("month")
-    .isInt({ min: 1, max: 12 })
-    .withMessage("month must be between 1 and 12"),
-];
+export { yearParam, monthParam, paginationQuery, yearQuery, monthQuery, searchQuery };
 
 export const profileIdParam = [
   param("profileId").notEmpty().withMessage("profileId is required"),
@@ -24,48 +22,6 @@ export const inactivityYearQuery = [
     .withMessage("inactivityToYear must be a valid year between 1900 and 2100"),
 ];
 
-export const searchQuery = [
-  query("q")
-    .optional()
-    .isString()
-    .isLength({ min: 1, max: 200 })
-    .withMessage("q must be a non-empty string with max 200 characters")
-    .trim(),
-];
-
-// Pagination validators
-export const paginationQuery = [
-  query("limit")
-    .optional()
-    .isInt({ min: 1, max: 1000 })
-    .withMessage("limit must be an integer between 1 and 1000")
-    .toInt(),
-  query("offset")
-    .optional()
-    .isInt({ min: 0 })
-    .withMessage("offset must be a non-negative integer")
-    .toInt(),
-];
-
-// Year query parameter (for filtering in collection endpoint)
-export const yearQuery = [
-  query("year")
-    .optional()
-    .isInt({ min: 1900, max: 2100 })
-    .withMessage("year must be a 4-digit integer within range (1900-2100)")
-    .toInt(),
-];
-
-// Month query parameter (for filtering)
-export const monthQuery = [
-  query("month")
-    .optional()
-    .isInt({ min: 1, max: 12 })
-    .withMessage("month must be between 1 and 12")
-    .toInt(),
-];
-
-// Status query parameter (for filtering)
 export const statusQuery = [
   query("status")
     .optional()
@@ -75,7 +31,6 @@ export const statusQuery = [
     .trim(),
 ];
 
-// Allowed orderBy fields for client-monthly-data
 const ALLOWED_ORDER_BY_FIELDS = [
   "profileId",
   "analysisPeriodFrom",
@@ -86,14 +41,12 @@ const ALLOWED_ORDER_BY_FIELDS = [
   "clientNameEn",
 ];
 
-// OrderBy validator with whitelist
 export const orderByQuery = [
   query("orderBy")
     .optional()
     .isString()
     .trim()
     .custom((value) => {
-      // Format: field:direction (e.g., "analysisPeriodFrom:DESC")
       const parts = value.split(":");
       if (parts.length > 2) {
         throw new Error("orderBy format must be 'field' or 'field:direction'");
@@ -117,7 +70,6 @@ export const orderByQuery = [
     .withMessage("orderBy must be a valid field with optional direction"),
 ];
 
-// Combined validators for client-monthly-data collection endpoint
 export const clientMonthlyDataCollectionQuery = [
   ...yearQuery,
   ...monthQuery,
@@ -127,7 +79,6 @@ export const clientMonthlyDataCollectionQuery = [
   ...paginationQuery,
 ];
 
-// Combined validators for year-specific endpoint
 export const clientMonthlyDataYearQuery = [
   ...monthQuery,
   ...searchQuery,

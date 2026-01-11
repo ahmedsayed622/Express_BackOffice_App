@@ -1,6 +1,6 @@
-// utils/errorFactory.js
+// utils/errors/errorFactory.js
 import CustomError from "./exceptions/CustomError.js";
-import { ERROR_CODES } from "../constants/errorCodes.js";
+import { ERROR_CODES } from "../../constants/errorCodes.js";
 
 /**
  * Creates a standardized error object

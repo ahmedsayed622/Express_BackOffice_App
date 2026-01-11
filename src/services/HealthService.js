@@ -1,5 +1,5 @@
 // services/HealthService.js
-import { getConnection } from "../config/oracledb.pool.js";
+import { ENV, getOraclePool, initOraclePool, getSequelize } from "../config/index.js";
 import { ErrorFactory } from "../utils/index.js";
 
 export async function checkIntegrations() {
@@ -10,21 +10,21 @@ export async function checkIntegrations() {
       driver: "node-oracledb",
       ok: false,
       pool: { min: null, max: null },
-      clientInit: !!process.env.ORACLE_CLIENT_LIB_DIR,
-      clientDir: process.env.ORACLE_CLIENT_LIB_DIR || "N/A",
+      clientInit: !!ENV.ORACLE.CLIENT_LIB_DIR,
+      clientDir: ENV.ORACLE.CLIENT_LIB_DIR || "N/A",
     },
   };
 
   try {
     // Test Sequelize ORM
     try {
-      const { sequelize } = await import("../config/db.config.js");
+      const sequelize = getSequelize();
       await sequelize.query("SELECT 1 AS x FROM dual", {
         type: sequelize.QueryTypes.SELECT,
       });
       results.orm.ok = true;
-      results.orm.pool.min = parseInt(process.env.DB_POOL_MIN) || 2;
-      results.orm.pool.max = parseInt(process.env.DB_POOL_MAX) || 10;
+      results.orm.pool.min = ENV.DB_POOL.MIN;
+      results.orm.pool.max = ENV.DB_POOL.MAX;
     } catch (ormError) {
       results.orm.error = ormError.message;
       results.success = false;
@@ -33,11 +33,15 @@ export async function checkIntegrations() {
     // Test node-oracledb
     let conn;
     try {
-      conn = await getConnection();
+      let pool = getOraclePool();
+      if (!pool) {
+        pool = await initOraclePool();
+      }
+      conn = await pool.getConnection();
       await conn.execute("SELECT 1 AS x FROM dual");
       results.proc.ok = true;
-      results.proc.pool.min = parseInt(process.env.ORA_POOL_MIN) || 2;
-      results.proc.pool.max = parseInt(process.env.ORA_POOL_MAX) || 10;
+      results.proc.pool.min = ENV.ORA_POOL.MIN;
+      results.proc.pool.max = ENV.ORA_POOL.MAX;
     } catch (procError) {
       results.proc.error = procError.message;
       results.success = false;

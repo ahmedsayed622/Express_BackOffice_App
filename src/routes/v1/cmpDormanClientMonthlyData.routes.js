@@ -1,13 +1,13 @@
 // routes/v1/cmpDormanClientMonthlyData.routes.js
 import express from "express";
 import { CmpDormanClientMonthlyDataController } from "../../controllers/index.js";
-import validateRequest from "../../middlewares/validateRequest.js";
+import { validateRequest } from "../../middlewares/index.js";
 import {
   yearParam,
   profileIdParam,
   clientMonthlyDataCollectionQuery,
   clientMonthlyDataYearQuery,
-} from "../../validators/cmpDormanValidators.js";
+} from "../../validators/index.js";
 
 const router = express.Router();
 

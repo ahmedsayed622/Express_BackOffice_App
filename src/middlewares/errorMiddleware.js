@@ -1,5 +1,6 @@
 // middlewares/errorMiddleware.js
 import { ERROR_CODES } from "../constants/errorCodes.js";
+import { ENV } from "../config/index.js";
 import { logger, isAppError } from "../utils/index.js";
 
 export default function errorMiddleware(err, req, res, next) {
@@ -17,7 +18,7 @@ export default function errorMiddleware(err, req, res, next) {
   };
 
   // Only add stack trace in non-production
-  if (process.env.NODE_ENV !== "production") {
+  if (ENV.NODE_ENV !== "production") {
     errorLog.stack = err.stack;
   }
 
@@ -87,7 +88,7 @@ export default function errorMiddleware(err, req, res, next) {
   // Handle other unknown errors - fallback to generic internal error
   const statusCode = err.status || err.statusCode || 500;
   const message =
-    process.env.NODE_ENV === "production"
+    ENV.NODE_ENV === "production"
       ? "Unexpected server error"
       : err.message || "Unexpected server error";
 
@@ -96,6 +97,6 @@ export default function errorMiddleware(err, req, res, next) {
     code: ERROR_CODES.INTERNAL_ERROR,
     message,
     timestamp: new Date().toISOString(),
-    ...(process.env.NODE_ENV !== "production" && { stack: err.stack }),
+    ...(ENV.NODE_ENV !== "production" && { stack: err.stack }),
   });
 }

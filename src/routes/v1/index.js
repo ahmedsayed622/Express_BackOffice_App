@@ -5,14 +5,16 @@ import cmpDormanClientControlRoutes from "./cmpDormanClientControl.routes.js";
 import cmpDormanSummaryRoutes from "./cmpDormanSummary.routes.js";
 import cmpDormanSummaryViewRoutes from "./cmpDormanSummaryView.routes.js";
 import cmpEmpDailyOrdersRoutes from "./cmpEmpDailyOrders.routes.js";
-import { run as runDormantOrchestrator } from "../../controllers/CmpDormanDormantProcedureController.js";
-import { checkIntegrations } from "../../controllers/HealthController.js";
-import { checkSchemaAndData } from "../../controllers/DiagnosticController.js";
-import validateRequest from "../../middlewares/validateRequest.js";
+import {
+  CmpDormanDormantProcedureController,
+  HealthController,
+  DiagnosticController,
+} from "../../controllers/index.js";
+import { validateRequest } from "../../middlewares/index.js";
 import {
   timeoutQuery,
   timeoutBody,
-} from "../../validators/cmpDormanValidators.js";
+} from "../../validators/index.js";
 
 const router = Router();
 
@@ -24,17 +26,17 @@ router.use("/summary-view", cmpDormanSummaryViewRoutes);
 router.use("/client-emp-daily-orders", cmpEmpDailyOrdersRoutes);
 
 // Health check endpoints
-router.get("/health/integrations", checkIntegrations);
+router.get("/health/integrations", HealthController.checkIntegrations);
 
 // Diagnostic endpoints (development/staging only)
-router.get("/diagnostics/schema-data", checkSchemaAndData);
+router.get("/diagnostics/schema-data", DiagnosticController.checkSchemaAndData);
 
 // Procedure endpoints
 router.post(
   "/procedures/dormant-orchestrator",
   [...timeoutQuery, ...timeoutBody],
   validateRequest,
-  runDormantOrchestrator
+  CmpDormanDormantProcedureController.run
 );
 
 // Add other v1 routes here as they are created

@@ -1,6 +1,6 @@
 // src/middlewares/rateLimiter.js
 import rateLimit from "express-rate-limit";
-import logger from "../utils/logger.js";
+import { logger } from "../utils/index.js";
 
 // General rate limiter - مناسب للتطبيقات الداخلية
 export const generalLimiter = rateLimit({

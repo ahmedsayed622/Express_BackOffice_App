@@ -1,8 +1,9 @@
-// utils/logger.js
+// utils/logging/logger.js
 import winston from "winston";
 import fs from "fs";
 import path from "path";
-import { resolveFromRoot } from "./paths.js";
+import { resolveFromRoot } from "../paths/paths.js";
+import { ENV } from "../../config/index.js";
 
 // Create logs directory if it doesn't exist (portable path)
 const logsDir = resolveFromRoot("logs");
@@ -19,7 +20,7 @@ const logFormat = winston.format.printf(
 
 // Determine log level from environment variable or fallback to NODE_ENV-based default
 function getLogLevel() {
-  if (process.env.LOG_LEVEL) {
+  if (ENV.LOG_LEVEL) {
     const validLevels = [
       "error",
       "warn",
@@ -29,10 +30,10 @@ function getLogLevel() {
       "debug",
       "silly",
     ];
-    const level = process.env.LOG_LEVEL.toLowerCase();
+    const level = ENV.LOG_LEVEL.toLowerCase();
     return validLevels.includes(level) ? level : "info";
   }
-  return process.env.NODE_ENV === "production" ? "info" : "debug";
+  return ENV.NODE_ENV === "production" ? "info" : "debug";
 }
 
 // Create logger

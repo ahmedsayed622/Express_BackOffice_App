@@ -1,5 +1,5 @@
 // services/CmpEmpDailyOrdersService.js
-import CmpEmpDailyOrdersRepository from "../repositories/CmpEmpDailyOrdersRepository.js";
+import { CmpEmpDailyOrdersRepository } from "../repositories/index.js";
 import { ErrorFactory } from "../utils/index.js";
 import { Op } from "sequelize";
 

@@ -1,6 +1,6 @@
 // routes/v1/cmpEmpDailyOrders.routes.js
 import { Router } from "express";
-import * as CmpEmpDailyOrdersController from "../../controllers/CmpEmpDailyOrdersController.js";
+import { CmpEmpDailyOrdersController } from "../../controllers/index.js";
 import { validateRequest } from "../../middlewares/index.js";
 import {
   invoiceNoParam,
@@ -8,9 +8,9 @@ import {
   yyyymmddParam,
   fromDateParam,
   rangeQuery,
-  searchQuery,
+  empDailyOrdersSearchQuery,
   listFilters,
-} from "../../validators/cmpEmpDailyOrdersValidators.js";
+} from "../../validators/index.js";
 
 const router = Router();
 
@@ -67,7 +67,7 @@ router.get(
 // GET /client-emp-daily-orders/search?q=term
 router.get(
   "/search",
-  searchQuery,
+  empDailyOrdersSearchQuery,
   validateRequest,
   CmpEmpDailyOrdersController.search
 );

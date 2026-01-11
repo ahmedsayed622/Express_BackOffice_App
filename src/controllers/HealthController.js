@@ -1,5 +1,5 @@
 // controllers/HealthController.js
-import * as HealthService from "../services/HealthService.js";
+import { HealthService } from "../services/index.js";
 import { asyncWrapper } from "../utils/index.js";
 
 export const checkIntegrations = asyncWrapper(async (req, res) => {

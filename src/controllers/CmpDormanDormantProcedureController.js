@@ -1,6 +1,6 @@
 // controllers/CmpDormanDormantProcedureController.js
-import { asyncWrapper } from "../utils/asyncWrapper.js";
-import CmpDormanDormantProcedureService from "../services/CmpDormanDormantProcedureService.js";
+import { asyncWrapper } from "../utils/index.js";
+import { CmpDormanDormantProcedureService } from "../services/index.js";
 
 export const run = asyncWrapper(async (req, res) => {
   const timeoutSeconds =

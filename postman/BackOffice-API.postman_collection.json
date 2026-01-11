@@ -1,0 +1,822 @@
+{
+  "info": {
+    "_postman_id": "8d0f63b5-2f6e-4f7e-8d6a-4b9d6e0d1b6a",
+    "name": "BackOffice API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Express BackOffice API collection (all routes)."
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Application health check."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            },
+            "description": "API health check."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/health/integrations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health/integrations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health", "integrations"]
+            },
+            "description": "Integration health check (Sequelize + node-oracledb)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Stage1 - Core GET",
+      "item": [
+        {
+          "name": "GET /api/v1/client-monthly-data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/client-monthly-data",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "client-monthly-data"]
+            },
+            "description": "Stage 1 core endpoint: client monthly data collection."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/v1/client-monthly-data/year/2025",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/client-monthly-data/year/2025",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "client-monthly-data", "year", "2025"]
+            },
+            "description": "Stage 1 core endpoint: client monthly data for a year."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/v1/client-control",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/client-control",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "client-control"]
+            },
+            "description": "Stage 1 core endpoint: client control list."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/v1/summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "summary"]
+            },
+            "description": "Stage 1 core endpoint: summary list."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/v1/summary-view",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/summary-view",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "summary-view"]
+            },
+            "description": "Stage 1 core endpoint: summary view list."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/v1/client-emp-daily-orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/client-emp-daily-orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "client-emp-daily-orders"]
+            },
+            "description": "Stage 1 core endpoint: employee daily orders list."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Other APIs",
+      "item": [
+        {
+          "name": "GET /",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": []
+            },
+            "description": "Root endpoint."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api",
+              "host": ["{{baseUrl}}"],
+              "path": ["api"]
+            },
+            "description": "API root documentation endpoint."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/v1/client-monthly-data/profile/:profileId",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/client-monthly-data/profile/123",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "client-monthly-data", "profile", "123"]
+            },
+            "description": "Client monthly data by profile ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/v1/summary/latest/:year",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/summary/latest/2025",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "summary", "latest", "2025"]
+            },
+            "description": "Summary latest by year."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/v1/client-emp-daily-orders/invoice/:invoiceNo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/client-emp-daily-orders/invoice/123",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "client-emp-daily-orders",
+                "invoice",
+                "123"
+              ]
+            },
+            "description": "Orders by invoice number."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/v1/client-emp-daily-orders/exec/:execId",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/client-emp-daily-orders/exec/EXEC123",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "client-emp-daily-orders",
+                "exec",
+                "EXEC123"
+              ]
+            },
+            "description": "Orders by execution ID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/v1/client-emp-daily-orders/date/:date",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/client-emp-daily-orders/date/20250101",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "client-emp-daily-orders",
+                "date",
+                "20250101"
+              ]
+            },
+            "description": "Orders by exact invoice date (YYYYMMDD)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/v1/client-emp-daily-orders/from/:from",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/client-emp-daily-orders/from/20250101",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "client-emp-daily-orders",
+                "from",
+                "20250101"
+              ]
+            },
+            "description": "Orders from a date onward."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/v1/client-emp-daily-orders/range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/client-emp-daily-orders/range?from=20250101&to=20250131",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "client-emp-daily-orders", "range"],
+              "query": [
+                { "key": "from", "value": "20250101" },
+                { "key": "to", "value": "20250131" }
+              ]
+            },
+            "description": "Orders within a date range."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/v1/client-emp-daily-orders/search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/client-emp-daily-orders/search?q=sample",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "client-emp-daily-orders", "search"],
+              "query": [{ "key": "q", "value": "sample" }]
+            },
+            "description": "Search orders by query string."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /api/v1/diagnostics/schema-data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/diagnostics/schema-data",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "diagnostics", "schema-data"]
+            },
+            "description": "Diagnostic endpoint (non-production only)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /api/v1/procedures/dormant-orchestrator",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"timeout\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/procedures/dormant-orchestrator?timeout=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "procedures", "dormant-orchestrator"],
+              "query": [{ "key": "timeout", "value": "5" }]
+            },
+            "description": "Run dormant orchestrator procedure."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Query Examples",
+      "item": [
+        {
+          "name": "Client Monthly Data - year/month/pagination",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/client-monthly-data?year=2025&month=1&limit=50&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "client-monthly-data"],
+              "query": [
+                { "key": "year", "value": "2025" },
+                { "key": "month", "value": "1" },
+                { "key": "limit", "value": "50" },
+                { "key": "offset", "value": "0" }
+              ]
+            },
+            "description": "Example using year/month and pagination on collection."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Client Monthly Data - search/status/orderBy",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/client-monthly-data?q=sample&status=ACTIVE&orderBy=inactivityToYear:DESC&limit=25&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "client-monthly-data"],
+              "query": [
+                { "key": "q", "value": "sample" },
+                { "key": "status", "value": "ACTIVE" },
+                { "key": "orderBy", "value": "inactivityToYear:DESC" },
+                { "key": "limit", "value": "25" },
+                { "key": "offset", "value": "0" }
+              ]
+            },
+            "description": "Example using search, status, and sorting."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Client Monthly Data - year path with filters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/client-monthly-data/year/2025?month=1&limit=100&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "client-monthly-data", "year", "2025"],
+              "query": [
+                { "key": "month", "value": "1" },
+                { "key": "limit", "value": "100" },
+                { "key": "offset", "value": "0" }
+              ]
+            },
+            "description": "Example using year path and month/pagination filters."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Emp Daily Orders - filters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/client-emp-daily-orders?execId=EXEC123&invoiceNo=123&profileId=456&stockId=789&from=20250101&to=20250131",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "client-emp-daily-orders"],
+              "query": [
+                { "key": "execId", "value": "EXEC123" },
+                { "key": "invoiceNo", "value": "123" },
+                { "key": "profileId", "value": "456" },
+                { "key": "stockId", "value": "789" },
+                { "key": "from", "value": "20250101" },
+                { "key": "to", "value": "20250131" }
+              ]
+            },
+            "description": "Example filters for daily orders list."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Emp Daily Orders - range example",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/client-emp-daily-orders/range?from=20250101&to=20250131",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "client-emp-daily-orders", "range"],
+              "query": [
+                { "key": "from", "value": "20250101" },
+                { "key": "to", "value": "20250131" }
+              ]
+            },
+            "description": "Example date range query."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 2xx', function () {",
+                  "  pm.expect(pm.response.code).to.be.within(200, 299);",
+                  "});",
+                  "pm.test('response is json', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

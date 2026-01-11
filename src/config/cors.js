@@ -1,7 +1,7 @@
-// config/cors.config.js
 import { logger } from "../utils/index.js";
+import { ENV } from "./bootstrap.js";
 
-export function getCorsConfiguration() {
+export function getCorsOptions() {
   const corsConfig = {
     development: {
       origin: [
@@ -13,37 +13,31 @@ export function getCorsConfiguration() {
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
       exposedHeaders: ["X-Total-Count"],
-      maxAge: 86400, // 24 hours
+      maxAge: 86400,
     },
     test: {
-      origin: process.env.ALLOWED_ORIGINS
-        ? process.env.ALLOWED_ORIGINS.split(",")
-        : [
-            "http://localhost:3000", // Default for testing
-          ],
+      origin: ENV.ALLOWED_ORIGINS || ["http://localhost:3000"],
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
       exposedHeaders: ["X-Total-Count"],
-      maxAge: 3600, // 1 hour
+      maxAge: 3600,
     },
     production: {
-      origin: process.env.ALLOWED_ORIGINS
-        ? process.env.ALLOWED_ORIGINS.split(",")
-        : [
-            "https://your-production-domain.com",
-            "http://your-production-server:3000",
-          ],
+      origin: ENV.ALLOWED_ORIGINS || [
+        "https://your-production-domain.com",
+        "http://your-production-server:3000",
+      ],
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
       exposedHeaders: ["X-Total-Count"],
-      maxAge: 3600, // 1 hour
+      maxAge: 3600,
       optionsSuccessStatus: 200,
     },
   };
 
-  const environment = process.env.NODE_ENV || "development";
+  const environment = ENV.NODE_ENV || "development";
   const config = corsConfig[environment];
 
   if (!config) {

@@ -1,5 +1,5 @@
 // controllers/CmpEmpDailyOrdersController.js
-import CmpEmpDailyOrdersService from "../services/CmpEmpDailyOrdersService.js";
+import { CmpEmpDailyOrdersService } from "../services/index.js";
 import { asyncWrapper } from "../utils/index.js";
 
 /**

@@ -1,71 +1,82 @@
-import { sequelize } from "../config/db.config.js";
-import CmpDormanClientControlModel, { CmpDormanClientControlModel as CmpDormanClientControlNamed } from "./CmpDormanClientControlModel.js";
-import CmpDormanClientMonthlyDataModel, { CmpDormanClientMonthlyDataModel as CmpDormanClientMonthlyDataNamed } from "./CmpDormanClientMonthlyDataModel.js";
-import CmpDormanSummaryModel, { CmpDormanSummaryModel as CmpDormanSummaryNamed } from "./CmpDormanSummaryModel.js";
-import CmpDormanSummaryViewModel, { CmpDormanSummaryViewModel as CmpDormanSummaryViewNamed } from "./CmpDormanSummaryViewModel.js";
-import CmpEmpDailyOrdersModel, { CmpEmpDailyOrdersModel as CmpEmpDailyOrdersNamed } from "./CmpEmpDailyOrdersModel.js";
-
+import { ENV } from "../config/index.js";
+import CmpDormanClientControlModel, {
+  CmpDormanClientControlModel as CmpDormanClientControlNamed,
+} from "./CmpDormanClientControlModel.js";
+import CmpDormanClientMonthlyDataModel, {
+  CmpDormanClientMonthlyDataModel as CmpDormanClientMonthlyDataNamed,
+} from "./CmpDormanClientMonthlyDataModel.js";
+import CmpDormanSummaryModel, {
+  CmpDormanSummaryModel as CmpDormanSummaryNamed,
+} from "./CmpDormanSummaryModel.js";
+import CmpDormanSummaryViewModel, {
+  CmpDormanSummaryViewModel as CmpDormanSummaryViewNamed,
+} from "./CmpDormanSummaryViewModel.js";
+import CmpEmpDailyOrdersModel, {
+  CmpEmpDailyOrdersModel as CmpEmpDailyOrdersNamed,
+} from "./CmpEmpDailyOrdersModel.js";
 
 export const db = {
-CmpDormanClientControlModel,
-CmpDormanClientControlNamed,
-CmpDormanClientMonthlyDataModel,
-CmpDormanClientMonthlyDataNamed,
-CmpDormanSummaryModel,
-CmpDormanSummaryNamed,
-CmpDormanSummaryViewModel,
-CmpDormanSummaryViewNamed,
-CmpEmpDailyOrdersModel,
-CmpEmpDailyOrdersNamed,
+  CmpDormanClientControlModel,
+  CmpDormanClientControlNamed,
+  CmpDormanClientMonthlyDataModel,
+  CmpDormanClientMonthlyDataNamed,
+  CmpDormanSummaryModel,
+  CmpDormanSummaryNamed,
+  CmpDormanSummaryViewModel,
+  CmpDormanSummaryViewNamed,
+  CmpEmpDailyOrdersModel,
+  CmpEmpDailyOrdersNamed,
 };
-
 
 export const syncModels = async () => {
   try {
-    // ⚠️ CRITICAL WARNING: Oracle schema sync is unreliable
+    // ƒ?ÿ‹?? CRITICAL WARNING: Oracle schema sync is unreliable
     // Tables should be created manually in BACK_OFFICE schema
     // This function should NEVER be used in production
-    
-    if (process.env.DB_SYNC !== "true") {
-      console.log("ℹ️  DB_SYNC is disabled - skipping model synchronization");
-      console.log("ℹ️  Tables should exist in BACK_OFFICE schema");
+
+    if (ENV.DB_SYNC !== "true") {
+      console.log("ƒ??‹??  DB_SYNC is disabled - skipping model synchronization");
+      console.log("ƒ??‹??  Tables should exist in BACK_OFFICE schema");
       return;
     }
 
-    if (process.env.NODE_ENV === "production") {
-      console.error("❌ DB_SYNC is not allowed in production environment");
+    if (ENV.NODE_ENV === "production") {
+      console.error("ƒ?? DB_SYNC is not allowed in production environment");
       throw new Error("Model sync is disabled in production for safety");
     }
 
-    // Additional safety check - prevent creating tables in wrong schema
-    const dbUser = process.env.DB_USER;
+    const dbUser = ENV.DB.USER;
     if (dbUser !== "BACK_OFFICE") {
       console.error(
-        `❌ CRITICAL: Logged in as ${dbUser}, but tables are defined in BACK_OFFICE schema`
+        `ƒ?? CRITICAL: Logged in as ${dbUser}, but tables are defined in BACK_OFFICE schema`
       );
       console.error(
-        `❌ Sequelize may create tables in ${dbUser} schema instead of BACK_OFFICE`
+        `ƒ?? Sequelize may create tables in ${dbUser} schema instead of BACK_OFFICE`
       );
-      console.error(`❌ Aborting sync to prevent duplicate tables in wrong schema`);
-      console.error(`💡 To fix: Either login as BACK_OFFICE user, or create tables manually and set DB_SYNC=false`);
+      console.error(
+        "ƒ?? Aborting sync to prevent duplicate tables in wrong schema"
+      );
+      console.error(
+        "ñ??? To fix: Either login as BACK_OFFICE user, or create tables manually and set DB_SYNC=false"
+      );
       return;
     }
 
-    console.log("🔄 Syncing tables in development mode...");
+    console.log("ñ??? Syncing tables in development mode...");
     const models = [
       CmpDormanClientControlModel,
       CmpDormanClientMonthlyDataModel,
       CmpDormanSummaryModel,
       CmpEmpDailyOrdersModel,
-      // ⚠️ الفيو مستبعد من sync
+      // ƒ?ÿ‹?? á?â?â?â?â? â?á?á?á?á?á? â?â? sync
     ];
 
     for (const model of models) {
-      console.log(`🔄 Syncing ${model.name}...`);
+      console.log(`ñ??? Syncing ${model.name}...`);
       await model.sync({ force: false, alter: false });
     }
   } catch (err) {
-    console.error("❌ Error syncing models:", err);
-    throw err; // Re-throw to prevent server start with invalid state
+    console.error("ƒ?? Error syncing models:", err);
+    throw err;
   }
 };

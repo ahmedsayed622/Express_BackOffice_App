@@ -1,14 +1,13 @@
 // services/DiagnosticService.js
-import { sequelize } from "../config/db.config.js";
-import { getConnection } from "../config/oracledb.pool.js";
+import { ENV, getOraclePool, initOraclePool, getSequelize } from "../config/index.js";
 import { ErrorFactory } from "../utils/index.js";
 
 /**
  * Diagnostic service for investigating empty data issues
- * ⚠️ DEVELOPMENT/STAGING ONLY - Do not expose in production
+ * Г? Л?? DEVELOPMENT/STAGING ONLY - Do not expose in production
  */
 export async function checkSchemaAndData() {
-  if (process.env.NODE_ENV === "production") {
+  if (ENV.NODE_ENV === "production") {
     throw ErrorFactory.createError(
       "DIAGNOSTIC_DISABLED",
       403,
@@ -26,20 +25,21 @@ export async function checkSchemaAndData() {
 
   let conn;
   try {
-    // Get connection info
-    conn = await getConnection();
+    let pool = getOraclePool();
+    if (!pool) {
+      pool = await initOraclePool();
+    }
+    conn = await pool.getConnection();
 
-    // Check current session user
     const userResult = await conn.execute(
       "SELECT USER AS current_user, SYS_CONTEXT('USERENV', 'CURRENT_SCHEMA') AS current_schema FROM DUAL"
     );
     results.connection = {
       currentUser: userResult.rows[0][0],
       currentSchema: userResult.rows[0][1],
-      dbUser: process.env.DB_USER,
+      dbUser: ENV.DB.USER,
     };
 
-    // Check BACK_OFFICE schema table count
     try {
       const backofficeCountResult = await conn.execute(
         "SELECT COUNT(*) AS cnt FROM BACK_OFFICE.CMP_DORMAN_TBL_MONTHLY_DATA"
@@ -50,7 +50,6 @@ export async function checkSchemaAndData() {
         rowCount: backofficeCountResult.rows[0][0],
       };
 
-      // Get sample data from BACK_OFFICE
       const backOfficeSample = await conn.execute(
         `SELECT PROFILE_ID, CLIENT_NAME_EN, INACTIVITY_TO_YEAR 
          FROM BACK_OFFICE.CMP_DORMAN_TBL_MONTHLY_DATA 
@@ -64,7 +63,6 @@ export async function checkSchemaAndData() {
         })
       );
 
-      // Check records with INACTIVITY_TO_YEAR >= 2025
       const gte2025Result = await conn.execute(
         "SELECT COUNT(*) AS cnt FROM BACK_OFFICE.CMP_DORMAN_TBL_MONTHLY_DATA WHERE INACTIVITY_TO_YEAR >= 2025"
       );
@@ -76,7 +74,6 @@ export async function checkSchemaAndData() {
       };
     }
 
-    // Check current user's schema table count
     const currentUser = results.connection.currentUser;
     try {
       const userSchemaCountResult = await conn.execute(
@@ -88,7 +85,6 @@ export async function checkSchemaAndData() {
         rowCount: userSchemaCountResult.rows[0][0],
       };
 
-      // Get sample if table exists and has data
       if (userSchemaCountResult.rows[0][0] > 0) {
         const userSchemaSample = await conn.execute(
           `SELECT PROFILE_ID, CLIENT_NAME_EN, INACTIVITY_TO_YEAR 
@@ -111,8 +107,8 @@ export async function checkSchemaAndData() {
       };
     }
 
-    // Test Sequelize query (what the app actually uses)
     try {
+      const sequelize = getSequelize();
       const [sequelizeResults] = await sequelize.query(
         "SELECT COUNT(*) AS CNT FROM BACK_OFFICE.CMP_DORMAN_TBL_MONTHLY_DATA WHERE INACTIVITY_TO_YEAR >= 2025"
       );
@@ -126,14 +122,13 @@ export async function checkSchemaAndData() {
       };
     }
 
-    // Check if DB_SYNC was ever enabled
     results.environment = {
-      DB_SYNC: process.env.DB_SYNC,
-      NODE_ENV: process.env.NODE_ENV,
+      DB_SYNC: ENV.DB_SYNC,
+      NODE_ENV: ENV.NODE_ENV,
       warning:
-        process.env.DB_SYNC === "true"
-          ? "⚠️ DB_SYNC=true: Sequelize may have created tables in wrong schema"
-          : "✅ DB_SYNC disabled, tables not auto-created",
+        ENV.DB_SYNC === "true"
+          ? "Г? Л?? DB_SYNC=true: Sequelize may have created tables in wrong schema"
+          : "Г?? DB_SYNC disabled, tables not auto-created",
     };
 
     return results;

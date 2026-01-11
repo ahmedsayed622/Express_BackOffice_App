@@ -1,5 +1,5 @@
 // src/middlewares/index.js - Unified middleware exports
-import logger from "../utils/logger.js";
+import { logger } from "../utils/index.js";
 
 // Request logging middleware (enhanced)
 export const requestLogger = (req, res, next) => {

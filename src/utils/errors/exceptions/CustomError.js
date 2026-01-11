@@ -1,4 +1,4 @@
-// utils/exceptions/CustomError.js
+// utils/errors/exceptions/CustomError.js
 /**
  * Custom error class for application-specific errors
  * Extends the native Error class with additional properties

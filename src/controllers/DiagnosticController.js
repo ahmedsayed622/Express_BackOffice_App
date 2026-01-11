@@ -1,5 +1,5 @@
 // controllers/DiagnosticController.js
-import * as DiagnosticService from "../services/DiagnosticService.js";
+import { DiagnosticService } from "../services/index.js";
 import { asyncWrapper } from "../utils/index.js";
 
 /**
