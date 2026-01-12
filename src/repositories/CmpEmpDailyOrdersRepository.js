@@ -3,6 +3,106 @@ import { Op } from "sequelize";
 import CmpEmpDailyOrdersModel from "../models/CmpEmpDailyOrdersModel.js";
 
 const CmpEmpDailyOrdersRepository = {
+  findWithFilters({
+    profileId,
+    date,
+    from,
+    to,
+    invoiceNo,
+    execId,
+    stockId,
+    q,
+    limit,
+    offset,
+    orderBy,
+  } = {}) {
+    const where = {};
+
+    if (profileId !== undefined && profileId !== null && profileId !== "") {
+      where.profileId = Number(profileId);
+    }
+
+    if (date !== undefined && date !== null && date !== "") {
+      where.invoiceDate = Number(date);
+    } else if (from !== undefined && to !== undefined) {
+      where.invoiceDate = {
+        [Op.between]: [Number(from), Number(to)],
+      };
+    }
+
+    if (invoiceNo !== undefined && invoiceNo !== null && invoiceNo !== "") {
+      where.invoiceNo = Number(invoiceNo);
+    }
+
+    if (execId !== undefined && execId !== null && execId !== "") {
+      where.execId = Number(execId);
+    }
+
+    if (stockId !== undefined && stockId !== null && stockId !== "") {
+      where.stockId = Number(stockId);
+    }
+
+    const andConditions = [];
+    if (Object.keys(where).length > 0) {
+      andConditions.push(where);
+    }
+
+    if (q) {
+      const term = String(q).trim();
+      const numericTerm = parseInt(term, 10);
+      const isNumeric = !Number.isNaN(numericTerm) && Number.isFinite(numericTerm);
+
+      const orConditions = [
+        { customerNameEn: { [Op.like]: `%${term}%` } },
+        { execId: { [Op.like]: `%${term}%` } },
+      ];
+
+      if (isNumeric) {
+        orConditions.push(
+          { invoiceNo: numericTerm },
+          { stockId: numericTerm },
+          { profileId: numericTerm },
+          { qty: numericTerm },
+          { secondProfile: numericTerm },
+          { invoiceDate: numericTerm }
+        );
+      }
+
+      andConditions.push({ [Op.or]: orConditions });
+    }
+
+    const finalWhere =
+      andConditions.length > 1
+        ? { [Op.and]: andConditions }
+        : andConditions[0] || {};
+
+    let order = [
+      ["invoiceDate", "DESC"],
+      ["invoiceNo", "ASC"],
+    ];
+
+    if (orderBy) {
+      const [field, direction = "ASC"] = String(orderBy).split(":");
+      order = [[field, direction.toUpperCase()]];
+    }
+
+    const hasPagination = limit !== undefined || offset !== undefined;
+    if (hasPagination) {
+      return CmpEmpDailyOrdersModel.findAndCountAll({
+        where: finalWhere,
+        order,
+        limit: limit !== undefined ? Number(limit) : undefined,
+        offset: offset !== undefined ? Number(offset) : undefined,
+        raw: true,
+      });
+    }
+
+    return CmpEmpDailyOrdersModel.findAll({
+      where: finalWhere,
+      order,
+      raw: true,
+    });
+  },
   /**
    * Find all records with optional where conditions and ordering
    * @param {Object} where - Where conditions

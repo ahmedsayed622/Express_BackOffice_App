@@ -2,6 +2,7 @@
 import express from "express";
 import { CmpDormanClientMonthlyDataController } from "../../controllers/index.js";
 import { validateRequest } from "../../middlewares/index.js";
+import { asyncWrapper } from "../../utils/index.js";
 import {
   yearParam,
   profileIdParam,
@@ -20,7 +21,7 @@ router.get(
   "/",
   clientMonthlyDataCollectionQuery,
   validateRequest,
-  CmpDormanClientMonthlyDataController.getCollection
+  asyncWrapper(CmpDormanClientMonthlyDataController.getCollection)
 );
 
 /**
@@ -33,7 +34,7 @@ router.get(
   yearParam,
   clientMonthlyDataYearQuery,
   validateRequest,
-  CmpDormanClientMonthlyDataController.getByYear
+  asyncWrapper(CmpDormanClientMonthlyDataController.getByYear)
 );
 
 /**
@@ -44,7 +45,7 @@ router.get(
   "/profile/:profileId",
   profileIdParam,
   validateRequest,
-  CmpDormanClientMonthlyDataController.getByProfileId
+  asyncWrapper(CmpDormanClientMonthlyDataController.getByProfileId)
 );
 
 export default router;

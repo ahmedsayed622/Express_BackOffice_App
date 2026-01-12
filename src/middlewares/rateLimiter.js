@@ -2,17 +2,18 @@
 import rateLimit from "express-rate-limit";
 import { logger } from "../utils/index.js";
 
-// General rate limiter - مناسب للتطبيقات الداخلية
+// General rate limiter for internal apps
 export const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 دقيقة
-  max: 1000, // حد أقصى 1000 طلب لكل 15 دقيقة (مناسب للتطبيقات الداخلية)
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // Max 1000 requests per 15 minutes (internal app default)
   message: {
     status: "error",
-    message: "تم تجاوز الحد الأقصى للطلبات. يرجى المحاولة مرة أخرى بعد قليل.",
+    message:
+      "Too many requests. Please try again after a short delay.",
     retryAfter: "15 minutes",
   },
-  standardHeaders: true, // إرجاع معلومات rate limit في headers
-  legacyHeaders: false, // تعطيل X-RateLimit-* headers القديمة
+  standardHeaders: true,
+  legacyHeaders: false,
   handler: (req, res) => {
     logger.warn(`Rate limit exceeded for IP: ${req.ip}`, {
       ip: req.ip,
@@ -22,25 +23,26 @@ export const generalLimiter = rateLimit({
 
     res.status(429).json({
       status: "error",
-      message: "تم تجاوز الحد الأقصى للطلبات. يرجى المحاولة مرة أخرى بعد قليل.",
+      message:
+        "Too many requests. Please try again after a short delay.",
       retryAfter: "15 minutes",
       timestamp: new Date().toISOString(),
     });
   },
   skip: (req) => {
-    // تخطي rate limiting للـ health checks
+    // Skip rate limiting for health checks
     return req.path === "/health" || req.path === "/";
   },
 });
 
-// Strict rate limiter للعمليات الحساسة (مثل تسجيل الدخول)
+// Strict rate limiter for sensitive operations (e.g., login)
 export const strictLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 دقيقة
-  max: 5, // حد أقصى 5 محاولات لكل 15 دقيقة
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Max 5 attempts per 15 minutes
   message: {
     status: "error",
     message:
-      "تم تجاوز الحد الأقصى لمحاولات تسجيل الدخول. يرجى المحاولة مرة أخرى بعد 15 دقيقة.",
+      "Too many attempts. Please try again after 15 minutes.",
     retryAfter: "15 minutes",
   },
   standardHeaders: true,
@@ -55,17 +57,17 @@ export const strictLimiter = rateLimit({
     res.status(429).json({
       status: "error",
       message:
-        "تم تجاوز الحد الأقصى لمحاولات تسجيل الدخول. يرجى المحاولة مرة أخرى بعد 15 دقيقة.",
+        "Too many attempts. Please try again after 15 minutes.",
       retryAfter: "15 minutes",
       timestamp: new Date().toISOString(),
     });
   },
 });
 
-// API rate limiter - للـ API endpoints العامة
+// API rate limiter for public endpoints
 export const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 دقيقة
-  max: 500, // حد أقصى 500 طلب لكل 15 دقيقة
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 500, // Max 500 requests per 15 minutes
   message: {
     success: false,
     code: "RATE_LIMIT_EXCEEDED",

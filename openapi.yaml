@@ -1,0 +1,578 @@
+openapi: 3.0.3
+info:
+  title: Express BackOffice API
+  version: "1.0.0"
+  description: Express BackOffice API for reporting, summaries, and procedure execution.
+servers:
+  - url: http://localhost:3000
+security:
+  - ApiKeyAuth: []
+tags:
+  - name: Health
+  - name: ClientMonthlyData
+  - name: ClientControl
+  - name: Summary
+  - name: SummaryView
+  - name: EmpDailyOrders
+  - name: Procedures
+  - name: Diagnostics
+paths:
+  /:
+    get:
+      tags: [Health]
+      summary: Root status
+      security: []
+      responses:
+        "200":
+          description: Root status response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RootResponse"
+  /health:
+    get:
+      tags: [Health]
+      summary: Application health check
+      security: []
+      responses:
+        "200":
+          description: Health status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppHealth"
+  /api:
+    get:
+      tags: [Health]
+      summary: API root response
+      security: []
+      responses:
+        "200":
+          description: API root response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiRootResponse"
+  /api/health:
+    get:
+      tags: [Health]
+      summary: API health response
+      security: []
+      responses:
+        "200":
+          description: API health response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiHealth"
+  /api/v1/health/integrations:
+    get:
+      tags: [Health]
+      summary: Integration health check (Sequelize + node-oracledb)
+      security: []
+      responses:
+        "200":
+          description: Integration status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntegrationHealth"
+  /api/v1/diagnostics/schema-data:
+    get:
+      tags: [Diagnostics]
+      summary: Diagnostic schema/data check (non-production only)
+      description: Disabled in production environments.
+      responses:
+        "200":
+          description: Diagnostic data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiagnosticResponse"
+        "403":
+          description: Disabled in production
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/procedures/dormant-orchestrator:
+    post:
+      tags: [Procedures]
+      summary: Run dormant orchestrator procedure
+      parameters:
+        - $ref: "#/components/parameters/TimeoutQuery"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TimeoutBody"
+      responses:
+        "200":
+          description: Procedure execution response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcedureResponse"
+        "409":
+          description: Already running
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "423":
+          description: Timeout
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/client-monthly-data:
+    get:
+      tags: [ClientMonthlyData]
+      summary: Client monthly data collection (always paginated)
+      parameters:
+        - $ref: "#/components/parameters/YearQuery"
+        - $ref: "#/components/parameters/MonthQuery"
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/StatusQuery"
+        - $ref: "#/components/parameters/CmdOrderByQuery"
+        - $ref: "#/components/parameters/LimitQuery"
+        - $ref: "#/components/parameters/OffsetQuery"
+      responses:
+        "200":
+          description: Paginated result set
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedResponse"
+  /api/v1/client-monthly-data/year/{year}:
+    get:
+      tags: [ClientMonthlyData]
+      summary: Client monthly data for a year (optional pagination)
+      parameters:
+        - $ref: "#/components/parameters/YearParam"
+        - $ref: "#/components/parameters/MonthQuery"
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/StatusQuery"
+        - $ref: "#/components/parameters/CmdOrderByQuery"
+        - $ref: "#/components/parameters/LimitQuery"
+        - $ref: "#/components/parameters/OffsetQuery"
+      responses:
+        "200":
+          description: Year result set
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/YearResponse"
+  /api/v1/client-monthly-data/profile/{profileId}:
+    get:
+      tags: [ClientMonthlyData]
+      summary: Client monthly data by profile ID
+      parameters:
+        - $ref: "#/components/parameters/ProfileIdParam"
+      responses:
+        "200":
+          description: Single record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SingleResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/client-control:
+    get:
+      tags: [ClientControl]
+      summary: Client control list
+      responses:
+        "200":
+          description: Client control data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericListResponse"
+  /api/v1/summary:
+    get:
+      tags: [Summary]
+      summary: Summary list
+      responses:
+        "200":
+          description: Summary data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericListResponse"
+  /api/v1/summary/latest/{year}:
+    get:
+      tags: [Summary]
+      summary: Summary latest by year
+      parameters:
+        - $ref: "#/components/parameters/YearParam"
+      responses:
+        "200":
+          description: Summary data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericListResponse"
+  /api/v1/summary-view:
+    get:
+      tags: [SummaryView]
+      summary: Summary view list
+      responses:
+        "200":
+          description: Summary view data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenericListResponse"
+  /api/v1/client-emp-daily-orders:
+    get:
+      tags: [EmpDailyOrders]
+      summary: Employee daily orders (optional pagination)
+      description: Provide either date or from/to. If both are sent, date takes precedence.
+      parameters:
+        - $ref: "#/components/parameters/DateQuery"
+        - $ref: "#/components/parameters/FromQuery"
+        - $ref: "#/components/parameters/ToQuery"
+        - $ref: "#/components/parameters/InvoiceNoQuery"
+        - $ref: "#/components/parameters/ExecIdQuery"
+        - $ref: "#/components/parameters/StockIdQuery"
+        - $ref: "#/components/parameters/QQuery"
+        - $ref: "#/components/parameters/LimitQuery200"
+        - $ref: "#/components/parameters/OffsetQuery"
+        - $ref: "#/components/parameters/EmpOrderByQuery"
+      responses:
+        "200":
+          description: Employee daily orders data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmpDailyOrdersResponse"
+  /api/v1/client-emp-daily-orders/profile/{profileId}:
+    get:
+      tags: [EmpDailyOrders]
+      summary: Employee daily orders by profileId (optional pagination)
+      description: Provide either date or from/to. If both are sent, date takes precedence.
+      parameters:
+        - $ref: "#/components/parameters/ProfileIdParam"
+        - $ref: "#/components/parameters/DateQuery"
+        - $ref: "#/components/parameters/FromQuery"
+        - $ref: "#/components/parameters/ToQuery"
+        - $ref: "#/components/parameters/InvoiceNoQuery"
+        - $ref: "#/components/parameters/ExecIdQuery"
+        - $ref: "#/components/parameters/StockIdQuery"
+        - $ref: "#/components/parameters/QQuery"
+        - $ref: "#/components/parameters/LimitQuery200"
+        - $ref: "#/components/parameters/OffsetQuery"
+        - $ref: "#/components/parameters/EmpOrderByQuery"
+      responses:
+        "200":
+          description: Employee daily orders data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmpDailyOrdersResponse"
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+  parameters:
+    YearParam:
+      name: year
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1900
+        maximum: 2100
+    ProfileIdParam:
+      name: profileId
+      in: path
+      required: true
+      schema:
+        type: string
+    YearQuery:
+      name: year
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1900
+        maximum: 2100
+    MonthQuery:
+      name: month
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 12
+    SearchQuery:
+      name: q
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 200
+    StatusQuery:
+      name: status
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 50
+    CmdOrderByQuery:
+      name: orderBy
+      in: query
+      required: false
+      schema:
+        type: string
+        example: inactivityToYear:DESC
+        description: Allowed fields: profileId, analysisPeriodFrom, analysisPeriodTo, analysisMonth, inactivityFromYear, inactivityToYear, clientNameEn
+    LimitQuery:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+    LimitQuery200:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 200
+    OffsetQuery:
+      name: offset
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+    TimeoutQuery:
+      name: timeout
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 3600
+    DateQuery:
+      name: date
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 19000101
+        maximum: 21001231
+      description: YYYYMMDD
+    FromQuery:
+      name: from
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 19000101
+        maximum: 21001231
+      description: YYYYMMDD
+    ToQuery:
+      name: to
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 19000101
+        maximum: 21001231
+      description: YYYYMMDD
+    InvoiceNoQuery:
+      name: invoiceNo
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+    ExecIdQuery:
+      name: execId
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+    StockIdQuery:
+      name: stockId
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+    QQuery:
+      name: q
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 100
+    EmpOrderByQuery:
+      name: orderBy
+      in: query
+      required: false
+      schema:
+        type: string
+        example: invoiceDate:DESC
+        description: Allowed fields: invoiceDate, invoiceNo, execId, stockId, profileId, qty, secondProfile, customerNameEn
+  schemas:
+    RootResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        version:
+          type: string
+        documentation:
+          type: string
+    ApiRootResponse:
+      type: object
+      additionalProperties: true
+    ApiHealth:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        version:
+          type: string
+        timestamp:
+          type: string
+    AppHealth:
+      type: object
+      properties:
+        status:
+          type: string
+        timestamp:
+          type: string
+        uptime:
+          type: number
+        environment:
+          type: string
+        version:
+          type: string
+        memory:
+          type: object
+          properties:
+            used:
+              type: string
+            total:
+              type: string
+    Pagination:
+      type: object
+      properties:
+        limit:
+          type: integer
+        offset:
+          type: integer
+        count:
+          type: integer
+        total:
+          type: integer
+    GenericListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    GenericSingleResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          additionalProperties: true
+    PaginatedResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+    YearResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+    SingleResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          additionalProperties: true
+    EmpDailyOrdersResponse:
+      oneOf:
+        - $ref: "#/components/schemas/GenericListResponse"
+        - $ref: "#/components/schemas/PaginatedResponse"
+    IntegrationHealth:
+      type: object
+      additionalProperties: true
+    DiagnosticResponse:
+      type: object
+      additionalProperties: true
+    ProcedureResponse:
+      type: object
+      additionalProperties: true
+    TimeoutBody:
+      type: object
+      properties:
+        timeout:
+          type: integer
+          minimum: 0
+          maximum: 3600
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        code:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+        requestId:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+        field:
+          type: string
+        number:
+          type: integer

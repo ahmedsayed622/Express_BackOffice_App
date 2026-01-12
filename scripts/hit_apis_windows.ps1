@@ -60,7 +60,7 @@ function Invoke-Api {
 }
 
 # Start testing
-Write-Host "🚀 Express BackOffice API - Compliance Module Test" -ForegroundColor Green
+Write-Host "Express BackOffice API - Compliance Module Test" -ForegroundColor Green
 Write-Host "Base URL: $BaseUrl" -ForegroundColor Blue
 Write-Host "API Base: $ApiBase" -ForegroundColor Blue
 
@@ -97,21 +97,21 @@ Invoke-Api -Method "POST" -Uri "$ApiBase/procedures/dormant-orchestrator?timeout
 Invoke-Api -Method "POST" -Uri "$ApiBase/procedures/dormant-orchestrator?timeout=30" -Description "Dormant Orchestrator - 30s Timeout"
 
 # Summary
-Write-Host "`n✅ API Testing Complete!" -ForegroundColor Green
+Write-Host "`nAPI testing complete." -ForegroundColor Green
 Write-Host "`nExpected Status Codes:" -ForegroundColor Blue
-Write-Host "  • 200 - Success" -ForegroundColor Green
-Write-Host "  • 404 - Not Found (normal for specific IDs)" -ForegroundColor Yellow
-Write-Host "  • 409 - Already Running (normal for procedures)" -ForegroundColor Red
-Write-Host "  • 423 - Lock Timeout (normal for procedures)" -ForegroundColor Red
-Write-Host "  • 500 - Server Error (investigate if occurs)" -ForegroundColor Red
+Write-Host "  - 200 - Success" -ForegroundColor Green
+Write-Host "  - 404 - Not Found (normal for specific IDs)" -ForegroundColor Yellow
+Write-Host "  - 409 - Already Running (normal for procedures)" -ForegroundColor Red
+Write-Host "  - 423 - Lock Timeout (normal for procedures)" -ForegroundColor Red
+Write-Host "  - 500 - Server Error (investigate if occurs)" -ForegroundColor Red
 
 Write-Host "`nEnvironment URLs:" -ForegroundColor Blue
-Write-Host "  • Development: http://localhost:3000"
-Write-Host "  • Test: http://YOUR-TEST-SERVER:3000"
-Write-Host "  • Production: http://YOUR-PROD-SERVER:3000"
+Write-Host "  - Development: http://localhost:3000"
+Write-Host "  - Test: http://YOUR-TEST-SERVER:3000"
+Write-Host "  - Production: http://YOUR-PROD-SERVER:3000"
 
 Write-Host "`nFor detailed testing, use the Postman collection:" -ForegroundColor Green
-Write-Host "  Import: postman/ComplianceAPI.postman_collection.json"
+Write-Host "  Import: postman/BackOffice-API.postman_collection.json"
 
 Write-Host "`nUsage Examples:" -ForegroundColor Blue
 Write-Host '  powershell -ExecutionPolicy Bypass -File scripts\hit_apis_windows.ps1'

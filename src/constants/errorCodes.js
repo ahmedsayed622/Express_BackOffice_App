@@ -6,6 +6,10 @@ export const ERROR_CODES = {
   NOT_FOUND: "NOT_FOUND",
   BAD_REQUEST: "BAD_REQUEST",
 
+    // Auth & security
+  UNAUTHORIZED: "UNAUTHORIZED",
+  FORBIDDEN: "FORBIDDEN",
+
   // Database errors
   DATABASE_ERROR: "DATABASE_ERROR",
 

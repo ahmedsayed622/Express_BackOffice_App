@@ -41,6 +41,10 @@ if (!process.env.ORACLE_CLIENT_PATH) {
   console.warn("ORACLE_CLIENT_PATH not set in environment variables");
 }
 
+if (!process.env.API_KEY) {
+  console.warn("API_KEY not set in environment variables");
+}
+
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",")
   : null;
@@ -55,6 +59,7 @@ export const ENV = Object.freeze({
   ALLOWED_ORIGINS: allowedOrigins,
   ENABLE_RATE_LIMITING: process.env.ENABLE_RATE_LIMITING,
   DB_SYNC: process.env.DB_SYNC,
+  API_KEY: process.env.API_KEY || null,
   DB: {
     USER: process.env.DB_USER,
     PASSWORD: process.env.DB_PASSWORD,

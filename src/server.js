@@ -34,7 +34,7 @@ async function initializeDatabase() {
 
       if (recordCount === 0) {
         logger.warn(
-          "ƒ?ÿ‹??  Table BACK_OFFICE.CMP_DORMAN_TBL_MONTHLY_DATA is empty",
+          "Warning: Table BACK_OFFICE.CMP_DORMAN_TBL_MONTHLY_DATA is empty",
           {
             service: "startup-check",
             hint: "Check if data has been loaded into BACK_OFFICE schema",
@@ -42,7 +42,7 @@ async function initializeDatabase() {
         );
       } else {
         logger.info(
-          `ƒ?? Table verification: ${recordCount} records found in BACK_OFFICE schema`,
+          `Table verification: ${recordCount} records found in BACK_OFFICE schema`,
           {
             service: "startup-check",
           }
@@ -50,7 +50,7 @@ async function initializeDatabase() {
       }
     } catch (tableCheckError) {
       logger.error(
-        "ƒ?? Unable to query BACK_OFFICE.CMP_DORMAN_TBL_MONTHLY_DATA",
+        "Unable to query BACK_OFFICE.CMP_DORMAN_TBL_MONTHLY_DATA",
         {
           service: "startup-check",
           error: tableCheckError.message,
@@ -92,23 +92,25 @@ async function startServer() {
 
     server = app.listen(ENV.APP_PORT, ENV.SERVER_HOST, () => {
       logger.info(
-        `ñ??? Server is running on ${ENV.SERVER_HOST}:${ENV.APP_PORT} in ${ENV.NODE_ENV} mode`
+        `Server is running on ${ENV.SERVER_HOST}:${ENV.APP_PORT} in ${ENV.NODE_ENV} mode`
       );
       logger.info(
-        `ñ??? Health check available at: http://localhost:${ENV.APP_PORT}/health`
+        `Health check available at: http://localhost:${ENV.APP_PORT}/health`
       );
       logger.info(
-        `ñ??? API endpoints available at: http://localhost:${ENV.APP_PORT}/api`
+        `API endpoints available at: http://localhost:${ENV.APP_PORT}/api`
       );
 
       if (ENV.NODE_ENV === "development") {
-        logger.info(`ñ??? Development Access: http://localhost:${ENV.APP_PORT}/api`);
+        logger.info(
+          `Development access: http://localhost:${ENV.APP_PORT}/api`
+        );
       } else {
-        logger.info(`ñ??? Server Access: Check your environment configuration`);
+        logger.info("Server access: Check your environment configuration");
         logger.info(`   - API: http://YOUR_SERVER:${ENV.APP_PORT}/api`);
         logger.info(`   - Health: http://YOUR_SERVER:${ENV.APP_PORT}/health`);
       }
-      logger.info(`ñ??? API Documentation: Check API_Documentation.md`);
+      logger.info("API documentation: Check API_Documentation.md");
     });
 
     return server;

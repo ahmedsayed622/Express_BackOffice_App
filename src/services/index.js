@@ -6,4 +6,5 @@ export { default as CmpDormanSummaryViewService } from "./CmpDormanSummaryViewSe
 export { default as CmpDormanDormantProcedureService } from "./CmpDormanDormantProcedureService.js";
 export { default as CmpEmpDailyOrdersService } from "./CmpEmpDailyOrdersService.js";
 export * as HealthService from "./HealthService.js";
+export { checkIntegrations } from "./HealthService.js";
 export * as DiagnosticService from "./DiagnosticService.js";

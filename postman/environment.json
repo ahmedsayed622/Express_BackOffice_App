@@ -1,0 +1,11 @@
+{
+  "name": "Local",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "enabled": true
+    }
+  ],
+  "schema": "https://schema.getpostman.com/json/collection/v2.1.0/environment.json"
+}

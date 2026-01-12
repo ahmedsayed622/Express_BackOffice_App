@@ -27,7 +27,7 @@ function createSequelize() {
 
   if (ENV.DB_SYNC === "true") {
     logger.warn(
-      "ƒ?ÿ‹??  DB_SYNC=true detected - this may create tables in wrong schema with Oracle",
+      "Warning: DB_SYNC=true detected. This may create tables in the wrong schema with Oracle.",
       {
         service: "sequelize-oracle",
         dbUser: ENV.DB.USER,
@@ -55,7 +55,7 @@ function createSequelize() {
     },
     pool: poolConfig,
     logging: (sql) => {
-      console.log("SEQUELIZE_SQL:", sql);
+      logger.debug("SEQUELIZE_SQL: %s", sql);
     },
     benchmark: true,
     logQueryParameters: ENV.NODE_ENV === "development",
@@ -74,14 +74,14 @@ export async function initSequelize() {
 
   try {
     await sequelize.authenticate();
-    logger.info("ƒ?? Connection to Oracle DB has been established successfully");
+    logger.info("Connection to Oracle DB has been established successfully");
 
     const [results] = await sequelize.query("SELECT SYSDATE FROM DUAL");
-    logger.info(`ñ??? Database time: ${results[0].SYSDATE}`);
+    logger.info(`Database time: ${results[0].SYSDATE}`);
 
     return true;
   } catch (error) {
-    logger.error("ƒ?? Unable to connect to the database:", {
+    logger.error("Unable to connect to the database:", {
       service: "sequelize",
       message: error.message,
       code: error.code || "UNKNOWN",
@@ -91,19 +91,19 @@ export async function initSequelize() {
     });
 
     if (error.code === "ENOTFOUND") {
-      logger.error("ñ??? Check if the database host is correct and reachable", {
+      logger.error("Check if the database host is correct and reachable", {
         service: "sequelize",
         host: ENV.DB.HOST,
         port: ENV.DB.PORT,
       });
     } else if (error.errno === 1017) {
-      logger.error("ñ??? Check if the username and password are correct", {
+      logger.error("Check if the username and password are correct", {
         service: "sequelize",
         username: ENV.DB.USER,
       });
     } else if (error.errno === 12514) {
       logger.error(
-        "ñ??? ORA-12514: Service name not registered with listener or wrong service name",
+        "ORA-12514: Service name not registered with listener or wrong service name",
         {
           service: "sequelize",
           connectString: ENV.DB.CONNECT_STRING,
@@ -112,7 +112,7 @@ export async function initSequelize() {
       );
     } else if (error.errno === 12541) {
       logger.error(
-        "ñ??? Check if the Oracle listener is running on the specified port",
+        "Check if the Oracle listener is running on the specified port",
         {
           service: "sequelize",
           connectString: ENV.DB.CONNECT_STRING,

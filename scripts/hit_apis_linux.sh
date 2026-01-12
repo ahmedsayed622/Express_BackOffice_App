@@ -31,21 +31,21 @@ hit_api() {
     local method="$1"
     local endpoint="$2"
     local description="$3"
-    
+
     echo -e "\n${BLUE}=== $description ===${NC}"
     echo -e "${YELLOW}$method $endpoint${NC}"
-    
+
     if [ "$JQ_AVAILABLE" = true ]; then
         curl -sS -X "$method" "$endpoint" -w "\nHTTP %{http_code}\n" | jq '.' || echo "Response is not valid JSON"
     else
         curl -sS -X "$method" "$endpoint" -w "\nHTTP %{http_code}\n"
     fi
-    
+
     echo -e "${GREEN}---${NC}"
 }
 
 # Start testing
-echo -e "${GREEN}🚀 Express BackOffice API - Compliance Module Test${NC}"
+echo -e "${GREEN}Express BackOffice API - Compliance Module Test${NC}"
 echo -e "${BLUE}Base URL: $BASE_URL${NC}"
 echo -e "${BLUE}API Base: $API_BASE${NC}"
 
@@ -86,18 +86,18 @@ fi
 echo -e "${GREEN}---${NC}"
 
 # Summary
-echo -e "\n${GREEN}✅ API Testing Complete!${NC}"
+echo -e "\n${GREEN}API testing complete.${NC}"
 echo -e "${BLUE}Expected Status Codes:${NC}"
-echo -e "  • ${GREEN}200${NC} - Success"
-echo -e "  • ${YELLOW}404${NC} - Not Found (normal for specific IDs)"
-echo -e "  • ${RED}409${NC} - Already Running (normal for procedures)"
-echo -e "  • ${RED}423${NC} - Lock Timeout (normal for procedures)"
-echo -e "  • ${RED}500${NC} - Server Error (investigate if occurs)"
+echo -e "  - ${GREEN}200${NC} - Success"
+echo -e "  - ${YELLOW}404${NC} - Not Found (normal for specific IDs)"
+echo -e "  - ${RED}409${NC} - Already Running (normal for procedures)"
+echo -e "  - ${RED}423${NC} - Lock Timeout (normal for procedures)"
+echo -e "  - ${RED}500${NC} - Server Error (investigate if occurs)"
 
 echo -e "\n${BLUE}Environment URLs:${NC}"
-echo -e "  • Development: http://localhost:3000"
-echo -e "  • Test: http://YOUR-TEST-SERVER:3000"
-echo -e "  • Production: http://YOUR-PROD-SERVER:3000"
+echo -e "  - Development: http://localhost:3000"
+echo -e "  - Test: http://YOUR-TEST-SERVER:3000"
+echo -e "  - Production: http://YOUR-PROD-SERVER:3000"
 
 echo -e "\n${GREEN}For detailed testing, use the Postman collection:${NC}"
-echo -e "  Import: postman/ComplianceAPI.postman_collection.json"
+echo -e "  Import: postman/BackOffice-API.postman_collection.json"

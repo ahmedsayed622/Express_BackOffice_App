@@ -38,9 +38,9 @@ const shouldUseRateLimit =
 
 if (shouldUseRateLimit) {
   app.use(generalLimiter);
-  logger.info("ƒ?? Rate limiting enabled");
+  logger.info("Rate limiting enabled");
 } else {
-  logger.info("ƒ?ÿ‹??  Rate limiting disabled - Internal environment detected");
+  logger.info("Rate limiting disabled (non-production environment)");
 }
 
 app.use(express.json({ limit: "10mb" }));

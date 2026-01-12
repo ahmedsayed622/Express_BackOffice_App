@@ -3,8 +3,8 @@ import { ENV, getOraclePool, initOraclePool, getSequelize } from "../config/inde
 import { ErrorFactory } from "../utils/index.js";
 
 /**
- * Diagnostic service for investigating empty data issues
- * Г? Л?? DEVELOPMENT/STAGING ONLY - Do not expose in production
+ * Diagnostic service for investigating empty data issues.
+ * Development/staging only - do not expose in production.
  */
 export async function checkSchemaAndData() {
   if (ENV.NODE_ENV === "production") {
@@ -127,8 +127,8 @@ export async function checkSchemaAndData() {
       NODE_ENV: ENV.NODE_ENV,
       warning:
         ENV.DB_SYNC === "true"
-          ? "Г? Л?? DB_SYNC=true: Sequelize may have created tables in wrong schema"
-          : "Г?? DB_SYNC disabled, tables not auto-created",
+          ? "Warning: DB_SYNC=true. Sequelize may have created tables in the wrong schema."
+          : "DB_SYNC disabled; tables are not auto-created.",
     };
 
     return results;

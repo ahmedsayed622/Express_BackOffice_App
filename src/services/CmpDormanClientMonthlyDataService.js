@@ -65,6 +65,13 @@ function buildOrderClause(sort) {
   ];
 }
 
+function buildPaginationOptions(pagination) {
+  return {
+    limit: Number(pagination.limit) || 100,
+    offset: Number(pagination.offset) || 0,
+  };
+}
+
 export default {
   /**
    * Collection endpoint - Always paginated
@@ -76,10 +83,7 @@ export default {
     const order = buildOrderClause(sort);
 
     // Ensure limit and offset are valid numbers
-    const options = {
-      limit: Number(pagination.limit) || 100,
-      offset: Number(pagination.offset) || 0,
-    };
+    const options = buildPaginationOptions(pagination);
 
     const result = await CmpDormanClientMonthlyDataRepository.findAndCountAll(
       where,
@@ -105,10 +109,7 @@ export default {
 
     // If pagination provided, use it
     if (pagination.limit !== undefined) {
-      const options = {
-        limit: Number(pagination.limit) || 100,
-        offset: Number(pagination.offset) || 0,
-      };
+      const options = buildPaginationOptions(pagination);
 
       const result = await CmpDormanClientMonthlyDataRepository.findAndCountAll(
         where,

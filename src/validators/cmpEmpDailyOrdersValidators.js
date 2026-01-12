@@ -1,97 +1,114 @@
 // validators/cmpEmpDailyOrdersValidators.js
-import { param, query } from "express-validator";
-import { buildYyyymmddParam, buildYyyymmddQuery } from "./common.js";
+import { query } from "express-validator";
+import { buildYyyymmddQuery } from "./common.js";
 
-export const invoiceNoParam = [
-  param("invoiceNo")
-    .isInt({ min: 1 })
-    .withMessage("Invoice number must be a positive integer")
-    .toInt(),
+const ALLOWED_ORDER_BY_FIELDS = [
+  "invoiceDate",
+  "invoiceNo",
+  "execId",
+  "stockId",
+  "profileId",
+  "qty",
+  "secondProfile",
+  "customerNameEn",
 ];
 
-export const execIdParam = [
-  param("execId")
-    .isString()
-    .isLength({ min: 1, max: 18 })
-    .withMessage("Execution ID must be a string between 1-18 characters")
-    .trim(),
-];
-
-export const yyyymmddParam = buildYyyymmddParam("date", {
-  format: "Date must be in YYYYMMDD format (8 digits)",
-  year: "Year must be between 1900 and 2100",
-  month: "Month must be between 01 and 12",
-  day: "Day must be between 01 and 31",
-});
-
-export const fromDateParam = buildYyyymmddParam("from", {
-  format: "From date must be in YYYYMMDD format (8 digits)",
-  year: "From year must be between 1900 and 2100",
-  month: "From month must be between 01 and 12",
-  day: "From day must be between 01 and 31",
-});
-
-export const rangeQuery = [
+export const empDailyOrdersQuery = [
+  ...buildYyyymmddQuery("date", {
+    format: "date must be in YYYYMMDD format (8 digits)",
+    year: "date year must be between 1900 and 2100",
+    month: "date month must be between 01 and 12",
+    day: "date day must be between 01 and 31",
+  }),
   ...buildYyyymmddQuery("from", {
-    format: "From date must be in YYYYMMDD format (8 digits)",
-    year: "From year must be between 1900 and 2100",
-    month: "From month must be between 01 and 12",
-    day: "From day must be between 01 and 31",
+    format: "from must be in YYYYMMDD format (8 digits)",
+    year: "from year must be between 1900 and 2100",
+    month: "from month must be between 01 and 12",
+    day: "from day must be between 01 and 31",
   }),
   ...buildYyyymmddQuery("to", {
-    format: "To date must be in YYYYMMDD format (8 digits)",
-    year: "To year must be between 1900 and 2100",
-    month: "To month must be between 01 and 12",
-    day: "To day must be between 01 and 31",
+    format: "to must be in YYYYMMDD format (8 digits)",
+    year: "to year must be between 1900 and 2100",
+    month: "to month must be between 01 and 12",
+    day: "to day must be between 01 and 31",
   }),
-];
+  query("from").custom((value, { req }) => {
+    const fromValue = value ?? req.query.from;
+    const toValue = req.query.to;
+    const hasFrom = fromValue !== undefined && fromValue !== "";
+    const hasTo = toValue !== undefined && toValue !== "";
 
-export const fromQuery = buildYyyymmddQuery("from", {
-  format: "From date must be in YYYYMMDD format (8 digits)",
-  year: "From year must be between 1900 and 2100",
-  month: "From month must be between 01 and 12",
-  day: "From day must be between 01 and 31",
-});
+    if (hasFrom !== hasTo) {
+      throw new Error("from and to must be provided together");
+    }
 
-export const searchQuery = [
-  query("q")
-    .optional()
-    .isString()
-    .isLength({ min: 1, max: 200 })
-    .withMessage("Search query must be a string between 1-200 characters")
-    .trim(),
-];
+    if (hasFrom && hasTo) {
+      const fromNum = Number(fromValue);
+      const toNum = Number(toValue);
+      if (Number.isNaN(fromNum) || Number.isNaN(toNum)) {
+        throw new Error("from and to must be valid dates");
+      }
+      if (fromNum > toNum) {
+        throw new Error("from must be less than or equal to to");
+      }
+    }
 
-export const listFilters = [
-  query("execId")
-    .optional()
-    .isString()
-    .isLength({ min: 1, max: 18 })
-    .withMessage("ExecId filter must be a string between 1-18 characters")
-    .trim(),
+    return true;
+  }),
   query("invoiceNo")
     .optional()
     .isInt({ min: 1 })
-    .withMessage("InvoiceNo filter must be a positive integer")
+    .withMessage("invoiceNo must be a positive integer")
     .toInt(),
-  query("profileId")
+  query("execId")
     .optional()
     .isInt({ min: 1 })
-    .withMessage("ProfileId filter must be a positive integer")
+    .withMessage("execId must be a positive integer")
     .toInt(),
   query("stockId")
     .optional()
     .isInt({ min: 1 })
-    .withMessage("StockId filter must be a positive integer")
+    .withMessage("stockId must be a positive integer")
     .toInt(),
-  query("from")
+  query("q")
     .optional()
-    .matches(/^\d{8}$/)
-    .withMessage("From date must be in YYYYMMDD format (8 digits)")
-    .toInt(),
-  query("to")
+    .isString()
+    .isLength({ min: 1, max: 100 })
+    .withMessage("q must be a non-empty string with max 100 characters")
+    .trim(),
+  query("limit")
     .optional()
-    .matches(/^\d{8}$/)
-    .withMessage("To date must be in YYYYMMDD format (8 digits)")
+    .isInt({ min: 1, max: 200 })
+    .withMessage("limit must be an integer between 1 and 200")
     .toInt(),
+  query("offset")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("offset must be a non-negative integer")
+    .toInt(),
+  query("orderBy")
+    .optional()
+    .isString()
+    .trim()
+    .custom((value) => {
+      const parts = value.split(":");
+      if (parts.length > 2) {
+        throw new Error("orderBy format must be 'field' or 'field:direction'");
+      }
+
+      const field = parts[0];
+      const direction = parts[1] ? parts[1].toUpperCase() : "ASC";
+
+      if (!ALLOWED_ORDER_BY_FIELDS.includes(field)) {
+        throw new Error(
+          `orderBy field must be one of: ${ALLOWED_ORDER_BY_FIELDS.join(", ")}`
+        );
+      }
+
+      if (!["ASC", "DESC"].includes(direction)) {
+        throw new Error("orderBy direction must be ASC or DESC");
+      }
+
+      return true;
+    }),
 ];

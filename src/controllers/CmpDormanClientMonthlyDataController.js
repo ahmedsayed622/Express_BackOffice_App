@@ -1,36 +1,20 @@
 // controllers/CmpDormanClientMonthlyDataController.js
 import { CmpDormanClientMonthlyDataService } from "../services/index.js";
-import { asyncWrapper, ErrorFactory } from "../utils/index.js";
+import {
+  ErrorFactory,
+  buildPagination,
+  buildSort,
+  buildClientMonthlyDataFilters,
+} from "../utils/index.js";
 
 /**
  * Collection endpoint - Always paginated
  * GET /v1/client-monthly-data
  */
-const getCollection = asyncWrapper(async (req, res) => {
-  // Build sanitized filters from whitelisted query params
-  const filters = {};
-  if (req.query.year) filters.year = req.query.year;
-  if (req.query.month) filters.month = req.query.month;
-  if (req.query.q) filters.q = req.query.q;
-  if (req.query.status) filters.status = req.query.status;
-
-  // Build pagination (always applied for collection)
-  // Ensure limit and offset are always numbers
-  const limit = req.query.limit !== undefined ? parseInt(req.query.limit, 10) : 100;
-  const offset = req.query.offset !== undefined ? parseInt(req.query.offset, 10) : 0;
-  
-  const pagination = {
-    limit,
-    offset,
-    mode: "always",
-  };
-
-  // Build sort options
-  const sort = {};
-  if (req.query.orderBy) {
-    const [field, direction = "ASC"] = req.query.orderBy.split(":");
-    sort.orderBy = { field, direction: direction.toUpperCase() };
-  }
+const getCollection = async (req, res) => {
+  const filters = buildClientMonthlyDataFilters(req.query);
+  const pagination = buildPagination(req.query, { mode: "always" });
+  const sort = buildSort(req.query);
 
   // Build unified query object
   const queryObject = { filters, pagination, sort };
@@ -50,38 +34,19 @@ const getCollection = asyncWrapper(async (req, res) => {
       total: result.total,
     },
   });
-});
+};
 
 /**
  * Year-specific endpoint - Optional pagination
  * GET /v1/client-monthly-data/year/:year
  */
-const getByYear = asyncWrapper(async (req, res) => {
+const getByYear = async (req, res) => {
   const year = parseInt(req.params.year, 10);
 
   // Build sanitized filters
-  const filters = { year };
-  if (req.query.month) filters.month = req.query.month;
-  if (req.query.q) filters.q = req.query.q;
-  if (req.query.status) filters.status = req.query.status;
-
-  // Build pagination (optional for year endpoint)
-  const pagination = {
-    mode: "optional",
-  };
-
-  // If limit/offset provided, apply pagination
-  if (req.query.limit !== undefined || req.query.offset !== undefined) {
-    pagination.limit = req.query.limit !== undefined ? parseInt(req.query.limit, 10) : 100;
-    pagination.offset = req.query.offset !== undefined ? parseInt(req.query.offset, 10) : 0;
-  }
-
-  // Build sort options
-  const sort = {};
-  if (req.query.orderBy) {
-    const [field, direction = "ASC"] = req.query.orderBy.split(":");
-    sort.orderBy = { field, direction: direction.toUpperCase() };
-  }
+  const filters = buildClientMonthlyDataFilters(req.query, { year });
+  const pagination = buildPagination(req.query, { mode: "optional" });
+  const sort = buildSort(req.query);
 
   // Build unified query object
   const queryObject = { filters, pagination, sort };
@@ -105,13 +70,13 @@ const getByYear = asyncWrapper(async (req, res) => {
   }
 
   return res.json(response);
-});
+};
 
 /**
  * Profile-specific endpoint (single record)
  * GET /v1/client-monthly-data/profile/:profileId
  */
-const getByProfileId = asyncWrapper(async (req, res) => {
+const getByProfileId = async (req, res) => {
   const profileId = req.params.profileId;
   const data = await CmpDormanClientMonthlyDataService.getByProfileId(
     profileId
@@ -124,6 +89,6 @@ const getByProfileId = asyncWrapper(async (req, res) => {
   }
 
   return res.json({ success: true, data });
-});
+};
 
 export { getCollection, getByYear, getByProfileId };

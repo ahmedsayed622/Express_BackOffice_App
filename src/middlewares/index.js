@@ -65,3 +65,6 @@ export { default as validateRequest } from "./validateRequest.js";
 
 // Export error middleware
 export { default as errorMiddleware } from "./errorMiddleware.js";
+
+// Export API key middleware
+export { default as requireApiKey } from "./apiKey.middleware.js";

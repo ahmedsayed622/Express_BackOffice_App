@@ -28,6 +28,9 @@ wallet/
 logs/
 *.log
 
+# Archives
+*.zip
+
 # OS generated files
 .DS_Store
 .DS_Store?

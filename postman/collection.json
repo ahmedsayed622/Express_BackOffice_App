@@ -1,0 +1,186 @@
+{
+  "info": {
+    "name": "Express BackOffice API",
+    "_postman_id": "f1f6a7c2-9a2b-4f52-9d1d-0c6b6acb8b5f",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "CmpDormanClientMonthlyData",
+      "item": [
+        {
+          "name": "Get Client Monthly Data (Paginated)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/client-monthly-data?year=2024&month=1&limit=50&offset=0"
+          }
+        },
+        {
+          "name": "Get Client Monthly Data By Year (No Pagination)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/client-monthly-data/year/2024"
+          }
+        },
+        {
+          "name": "Get Client Monthly Data By Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/client-monthly-data/profile/123"
+          }
+        }
+      ]
+    },
+    {
+      "name": "CmpDormanSummary",
+      "item": [
+        {
+          "name": "Get Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/summary"
+          }
+        },
+        {
+          "name": "Get Summary Latest By Year",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/summary/latest/2025"
+          }
+        }
+      ]
+    },
+    {
+      "name": "CmpDormanSummaryView",
+      "item": [
+        {
+          "name": "Get Summary View",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/summary-view"
+          }
+        }
+      ]
+    },
+    {
+      "name": "CmpDormanClientControl",
+      "item": [
+        {
+          "name": "Get Client Control",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/client-control"
+          }
+        }
+      ]
+    },
+    {
+      "name": "CmpEmpDailyOrders",
+      "item": [
+        {
+          "name": "Get Employee Daily Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/client-emp-daily-orders"
+          }
+        },
+        {
+          "name": "Get Employee Daily Orders By Date",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/client-emp-daily-orders?date=20260111"
+          }
+        },
+        {
+          "name": "Get Employee Daily Orders By Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/client-emp-daily-orders/profile/123"
+          }
+        },
+        {
+          "name": "Get Employee Daily Orders By Profile With Range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/client-emp-daily-orders/profile/123?from=20260101&to=20260111&q=ahmed"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "App Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health"
+          }
+        },
+        {
+          "name": "API Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/health"
+          }
+        },
+        {
+          "name": "Integration Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/health/integrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Procedures",
+      "item": [
+        {
+          "name": "Run Dormant Orchestrator",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/procedures/dormant-orchestrator?timeout=0",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Diagnostics (Internal)",
+      "item": [
+        {
+          "name": "Diagnostic Schema Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/diagnostics/schema-data"
+          }
+        }
+      ]
+    }
+  ]
+}

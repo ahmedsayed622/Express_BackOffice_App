@@ -10,13 +10,23 @@ import {
   HealthController,
   DiagnosticController,
 } from "../../controllers/index.js";
-import { validateRequest } from "../../middlewares/index.js";
+import { validateRequest, requireApiKey } from "../../middlewares/index.js";
+import { asyncWrapper } from "../../utils/index.js";
 import {
   timeoutQuery,
   timeoutBody,
 } from "../../validators/index.js";
 
 const router = Router();
+
+// Health check endpoints
+router.get(
+  "/health/integrations",
+  asyncWrapper(HealthController.checkIntegrations)
+);
+
+// Require API key for all remaining v1 routes
+router.use(requireApiKey);
 
 // Mount all routes with their respective paths
 router.use("/client-monthly-data", cmpDormanClientMonthlyDataRoutes);
@@ -25,18 +35,18 @@ router.use("/summary", cmpDormanSummaryRoutes);
 router.use("/summary-view", cmpDormanSummaryViewRoutes);
 router.use("/client-emp-daily-orders", cmpEmpDailyOrdersRoutes);
 
-// Health check endpoints
-router.get("/health/integrations", HealthController.checkIntegrations);
-
 // Diagnostic endpoints (development/staging only)
-router.get("/diagnostics/schema-data", DiagnosticController.checkSchemaAndData);
+router.get(
+  "/diagnostics/schema-data",
+  asyncWrapper(DiagnosticController.checkSchemaAndData)
+);
 
 // Procedure endpoints
 router.post(
   "/procedures/dormant-orchestrator",
   [...timeoutQuery, ...timeoutBody],
   validateRequest,
-  CmpDormanDormantProcedureController.run
+  asyncWrapper(CmpDormanDormantProcedureController.run)
 );
 
 // Add other v1 routes here as they are created
