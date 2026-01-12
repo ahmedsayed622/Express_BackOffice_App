@@ -1,6 +1,6 @@
 # Express BackOffice API
 
-Express API for dormant client reporting, summary views, and employee daily orders with Oracle-backed data access and procedure execution.
+Express API for dormant client reporting, summary views, employee daily orders, and Oracle procedure execution.
 
 ## Tech stack
 - Node.js + Express
@@ -13,45 +13,32 @@ Express API for dormant client reporting, summary views, and employee daily orde
 ## Quick start
 ```bash
 npm install
-
-# Development
 npm run start:dev
-
-# Production
-npm run start:prod
 ```
 
-## Security / Authentication
+## Authentication
 All `/api/v1` endpoints require an API key except `GET /api/v1/health/integrations`.
-
-Quick steps:
-```bash
-npm install
-npm run gen:api-key
-npm run start:dev
-```
-
-Example request:
+Provide the key with the `X-API-Key` header:
 ```bash
 curl -H "X-API-Key: <your-key>" http://localhost:3000/api/v1/client-monthly-data
 ```
+Set `API_KEY` in your environment or generate one (see `docs/SECURITY.md`).
 
-## Environment variables
-Copy `.env.example` to the target environment file (for example, `.env.development`) and fill in values.
+## Environment
+This project uses `dotenv-flow`. The runtime reads `.env` plus the environment file:
+- `start:dev` -> `.env` + `.env.development`
+- `start:prod` -> `.env` + `.env.production`
 
-Key settings:
-- `NODE_ENV`
-- `APP_PORT`
-- `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, `DB_NAME`
-- `ORACLE_CLIENT_PATH`, `ORACLE_CLIENT_LIB_DIR`
-- `ALLOWED_ORIGINS`
+See `.env.example` for the template.
 
-## API documentation
+## Docs
 - OpenAPI spec: `openapi.yaml`
 - Postman collection: `postman/collection.json`
 - Postman environment: `postman/environment.json`
+- Architecture: `docs/architecture.md`
+- Security: `docs/SECURITY.md`
 
-## Core endpoints
+## Endpoint groups
 Base path: `/api/v1`
 
 - Health
@@ -74,29 +61,3 @@ Base path: `/api/v1`
   - `GET /api/v1/client-emp-daily-orders/profile/:profileId`
 - Procedures
   - `POST /api/v1/procedures/dormant-orchestrator?timeout=0`
-
-Note: `GET /api/v1/diagnostics/schema-data` is for non-production diagnostics.
-
-## Project structure
-```
-src/
-  app.js
-  server.js
-  config/
-  controllers/
-  middlewares/
-  models/
-  repositories/
-  routes/
-  services/
-  utils/
-  validators/
-```
-
-## Testing
-```bash
-npm test
-```
-
-## Utilities
-- DB verification: `npm run verify:db`
