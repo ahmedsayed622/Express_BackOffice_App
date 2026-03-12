@@ -37,6 +37,7 @@ See `.env.example` for the template.
 - Postman environment: `postman/environment.json`
 - Architecture: `docs/architecture.md`
 - Security: `docs/SECURITY.md`
+- Contributing & repository visibility: `CONTRIBUTING.md`
 
 ## Endpoint groups
 Base path: `/api/v1`
